@@ -1,6 +1,6 @@
 # golab
 
-Simple TextGrid reading and writing for go.
+Simple HTK label reading and writing for go.
 
 ## example
 
