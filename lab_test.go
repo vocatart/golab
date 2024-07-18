@@ -14,7 +14,7 @@ func TestAnnotations(test *testing.T) {
 	testAnnotation := lab.annotations[0].label
 	testStart := lab.annotations[0].start
 	testEnd := lab.annotations[0].end
-	testDuration := lab.annotations[0].getDuration()
+	testDuration := lab.annotations[0].GetDuration()
 
 	if testAnnotation != "Test Annotation" {
 		test.Fatalf("wanted 'Test Annotation', recieved %s", testAnnotation)
@@ -36,7 +36,7 @@ func TestLab(test *testing.T) {
 
 	lab := Lab{annotations: annotations}
 
-	testLength := lab.getDuration()
+	testLength := lab.GetDuration()
 
 	if testLength != 10.5 {
 		test.Fatalf("wanted lab length of 10.5 sec, receieved %g", testLength)
@@ -44,7 +44,9 @@ func TestLab(test *testing.T) {
 }
 
 func TestReadWritingLab(test *testing.T) {
-	lab := readLab("examples/01.lab")
+	lab1 := ReadLab("examples/01.lab")
+	lab1.WriteLab("examples/output.lab", true)
 
-	writeLab(lab, "examples/output.lab")
+	lab2 := ReadLab("examples/02.lab")
+	lab2.WriteLab("examples/output2.lab", true)
 }
