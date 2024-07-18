@@ -1,5 +1,7 @@
 # golab
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/vocatart/golab.svg)](https://pkg.go.dev/github.com/vocatart/golab)
+
 Simple HTK label reading and writing for go.
 
 ## example
