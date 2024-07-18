@@ -32,13 +32,13 @@ func main() {
 
     lab.GetAnnotations() // get the annotations of a lab file
 
-    lab.SetAnnotations(Annotations[]{start: 0.0, end: 1.0, label: "Annotation"}) // set the annotations of a lab file
+    lab.SetAnnotations(Annotations[]{Start: 0.0, End: 1.0, Label: "Annotation"}) // set the annotations of a lab file
 
-    lab.PushAnnotation(Annotation{start: 0.0, end: 1.0, label: "Annotation"}) // push an annotation to the end of the annotations slice in a lab file
+    lab.PushAnnotation(Annotation{Start: 0.0, End: 1.0, Label: "Annotation"}) // push an annotation to the end of the annotations slice in a lab file
 
-    lab.AppendAnnotations(Annotations[]{start: 0.0, end: 1.0, label: "Annotation", start: 1.0, end: 2.0, label: "Annotation 2"}) // append annotations to the end of the annotations slice in a lab file
+    lab.AppendAnnotations(Annotations[]{Start: 0.0, End: 1.0, Label: "Annotation", Start: 1.0, End: 2.0, Label: "Annotation 2"}) // append annotations to the end of the annotations slice in a lab file
 
-    lab.InsertAnnotation(index: 0, Annotation{start: 0.0, end: 1.0, label: "Annotation"}) // insert an annotation at a specific index in the annotations slice in a lab file
+    lab.InsertAnnotation(index: 0, Annotation{Start: 0.0, End: 1.0, Label: "Annotation"}) // insert an annotation at a specific index in the annotations slice in a lab file
 
     lab.RemoveAnnotation(index: 0) // remove an annotation at a specific index in the annotations slice in a lab file
 
@@ -51,15 +51,15 @@ func main() {
     lab.SetPrecision(7) // set the precision of a lab file
 
     // get the three values inside annotations
-    lab.annotations[0].start // float64
-    lab.annotations[0].end // float64
-    lab.annotations[0].label // string
+    lab.Annotations[0].Start // float64
+    lab.Annotations[0].End // float64
+    lab.Annotations[0].Label // string
 
     // get the four values inside a lab
-    lab.annotations // []Annotation
-    lab.name // string
-    lab.denomination // *Denomination
-    lab.precision // uint8
+    lab.Annotations // []Annotation
+    lab.Name // string
+    lab.Denomination // *Denomination
+    lab.Precision // uint8
 }
 ```
 
