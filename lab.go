@@ -12,22 +12,22 @@ import (
 
 // An annotation has a starting and ending time in seconds, with a text label.
 type Annotation struct {
-	start float64
-	end   float64
-	label string
+	Start float64
+	End   float64
+	Label string
 }
 
 // A lab contains a collection of annotations.
 type Lab struct {
-	annotations  []Annotation
-	name         string
-	denomination *Denomination
-	precision    uint8
+	Annotations  []Annotation
+	Name         string
+	Denomination *Denomination
+	Precision    uint8
 }
 
 // A denomination is an optional value that can be used to indicate the denomination of a lab.
 type Denomination struct {
-	denomination int8
+	Denomination int8
 }
 
 // Takes a path to a .lab file and reads its contents into a Lab.
@@ -71,10 +71,10 @@ func ReadLab(path string) (result Lab) {
 
 		// join the rest of the line into a single string and add it to the annotations
 		label := strings.Join(labLine[2:], " ")
-		lab.annotations = append(lab.annotations, Annotation{start: start, end: end, label: label})
+		lab.Annotations = append(lab.Annotations, Annotation{Start: start, End: end, Label: label})
 	}
 
-	lab.name = filepath.Base(path)
+	lab.Name = filepath.Base(path)
 
 	return lab
 }
@@ -109,7 +109,7 @@ func (lab Lab) WriteLab(path string, overwrite ...bool) {
 	// if path is a directory, construct the desired filename. if path is a file, make it.
 	if filepath.Ext(path) == "" || (pathInfo != nil && pathInfo.IsDir()) {
 		// create the filename if the destination is a directory
-		fileName = filepath.Join(path, (lab.name + ".lab"))
+		fileName = filepath.Join(path, (lab.Name + ".lab"))
 	} else {
 		// if the path is a file, check if it already exists and if overwrite is false
 		if pathInfo != nil && !overwrite[0] {
@@ -128,18 +128,18 @@ func (lab Lab) WriteLab(path string, overwrite ...bool) {
 	var denomination float64
 
 	// if the lab has a denomination, use it, otherwise use 1.0
-	if lab.denomination != nil {
-		denomination = float64(lab.denomination.denomination)
+	if lab.Denomination != nil {
+		denomination = float64(lab.Denomination.Denomination)
 	} else {
 		denomination = 1.0
 	}
 
 	// iterate through the annotations and write them to the file
-	for _, labEntry := range lab.annotations {
-		start := labEntry.start * denomination
-		end := labEntry.end * denomination
+	for _, labEntry := range lab.Annotations {
+		start := labEntry.Start * denomination
+		end := labEntry.End * denomination
 
-		fmt.Fprintln(file, strconv.FormatFloat(start, 'f', 7, 64), strconv.FormatFloat(end, 'f', 7, 64), labEntry.label)
+		fmt.Fprintln(file, strconv.FormatFloat(start, 'f', 7, 64), strconv.FormatFloat(end, 'f', 7, 64), labEntry.Label)
 	}
 }
 
@@ -147,8 +147,8 @@ func (lab Lab) WriteLab(path string, overwrite ...bool) {
 func (lab Lab) ToString() string {
 	var result string
 
-	for _, annotation := range lab.annotations {
-		result += fmt.Sprintf("%s %s\n", strconv.FormatFloat(annotation.start, 'f', -1, 64), annotation.label)
+	for _, annotation := range lab.Annotations {
+		result += fmt.Sprintf("%s %s\n", strconv.FormatFloat(annotation.Start, 'f', -1, 64), annotation.Label)
 	}
 
 	return result
@@ -173,9 +173,9 @@ func (lab *Lab) parsePrecision(secondTime string) {
 	periodIndex := strings.Index(secondTime, ".")
 
 	if periodIndex == -1 {
-		lab.precision = 7
+		lab.Precision = 7
 		return
 	}
 
-	lab.precision = uint8(len(secondTime) - periodIndex - 1)
+	lab.Precision = uint8(len(secondTime) - periodIndex - 1)
 }

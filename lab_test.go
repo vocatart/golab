@@ -6,15 +6,15 @@ import (
 
 func TestAnnotations(test *testing.T) {
 	annotations := []Annotation{
-		{start: 0.0, end: 1.0, label: "Test Annotation"},
+		{Start: 0.0, End: 1.0, Label: "Test Annotation"},
 	}
 
-	lab := Lab{annotations: annotations}
+	lab := Lab{Annotations: annotations}
 
-	testAnnotation := lab.annotations[0].label
-	testStart := lab.annotations[0].start
-	testEnd := lab.annotations[0].end
-	testDuration := lab.annotations[0].GetDuration()
+	testAnnotation := lab.Annotations[0].Label
+	testStart := lab.Annotations[0].Start
+	testEnd := lab.Annotations[0].End
+	testDuration := lab.Annotations[0].GetDuration()
 
 	if testAnnotation != "Test Annotation" {
 		test.Fatalf("wanted 'Test Annotation', recieved %s", testAnnotation)
@@ -30,11 +30,11 @@ func TestAnnotations(test *testing.T) {
 
 func TestLab(test *testing.T) {
 	annotations := []Annotation{
-		{start: 0.0, end: 1.0, label: "Test Annotation"},
-		{start: 1.0, end: 10.5, label: "Test Annotation 2"},
+		{Start: 0.0, End: 1.0, Label: "Test Annotation"},
+		{Start: 1.0, End: 10.5, Label: "Test Annotation 2"},
 	}
 
-	lab := Lab{annotations: annotations}
+	lab := Lab{Annotations: annotations}
 
 	testLength := lab.GetDuration()
 
