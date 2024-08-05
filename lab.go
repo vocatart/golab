@@ -135,11 +135,13 @@ func (lab Lab) WriteLab(path string, overwrite ...bool) {
 	}
 
 	// iterate through the annotations and write them to the file
+	precision := lab.precision
+
 	for _, labEntry := range lab.annotations {
 		start := labEntry.start * denomination
 		end := labEntry.end * denomination
 
-		fmt.Fprintln(file, strconv.FormatFloat(start, 'f', 7, 64), strconv.FormatFloat(end, 'f', 7, 64), labEntry.label)
+		fmt.Fprintln(file, strconv.FormatFloat(start, 'f', int(precision), 64), strconv.FormatFloat(end, 'f', int(precision), 64), labEntry.label)
 	}
 }
 
@@ -148,7 +150,7 @@ func (lab Lab) ToString() string {
 	var result string
 
 	for _, annotation := range lab.annotations {
-		result += fmt.Sprintf("%s %s\n", strconv.FormatFloat(annotation.start, 'f', -1, 64), annotation.label)
+		result += fmt.Sprintf("%s %s %s\n", strconv.FormatFloat(annotation.start, 'f', int(lab.precision), 64), strconv.FormatFloat(annotation.end, 'f', int(lab.precision), 64), annotation.label)
 	}
 
 	return result
