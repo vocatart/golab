@@ -23,7 +23,7 @@ func main() {
 
     annotations = lab.GetAnnotations()
 
-    fmt.Print("annotation 0 has start time of %f, end time of %f, and label %s", annotations[0].GetStart(), annotations[0].GetEnd(), annotations.GetLabel())
+    fmt.Print("annotation 0 has start time of %f, end time of %f, and label %s", annotations[0].GetStart(), annotations[0].GetEnd(), annotations[0].GetLabel())
 }
 ```
 
