@@ -19,15 +19,9 @@ type Annotation struct {
 
 // A lab contains a collection of annotations.
 type Lab struct {
-	annotations  []Annotation
-	name         string
-	denomination *Denomination
-	precision    uint8
-}
-
-// A denomination is an optional value that can be used to indicate the denomination of a lab.
-type Denomination struct {
-	Denomination int8
+	annotations []Annotation
+	name        string
+	precision   uint8
 }
 
 // Takes a path to a .lab file and reads its contents into a Lab.
@@ -125,21 +119,12 @@ func (lab Lab) WriteLab(path string, overwrite ...bool) {
 	}
 	defer file.Close()
 
-	var denomination float64
-
-	// if the lab has a denomination, use it, otherwise use 1.0
-	if lab.denomination != nil {
-		denomination = float64(lab.denomination.Denomination)
-	} else {
-		denomination = 1.0
-	}
-
 	// iterate through the annotations and write them to the file
 	precision := lab.precision
 
 	for _, labEntry := range lab.annotations {
-		start := labEntry.start * denomination
-		end := labEntry.end * denomination
+		start := labEntry.start
+		end := labEntry.end
 
 		fmt.Fprintln(file, strconv.FormatFloat(start, 'f', int(precision), 64), strconv.FormatFloat(end, 'f', int(precision), 64), labEntry.label)
 	}
@@ -156,21 +141,7 @@ func (lab Lab) ToString() string {
 	return result
 }
 
-// TODO: implement
-// func (lab Lab) CheckAnnotations() []int {
-// 	var result []int
-
-// 	for i, annotation := range lab.annotations {
-// 		if annotation.start < 0 && annotation.end < 0 {
-// 			result = append(result, i)
-// 		}
-// 	}
-// }
-
-// TODO: implement
-// func (lab *Lab) RecalcAnnotations() {
-// }
-
+// Parses the precision of a lab file based on the context of the time durations
 func (lab *Lab) parsePrecision(secondTime string) {
 	periodIndex := strings.Index(secondTime, ".")
 
@@ -180,4 +151,20 @@ func (lab *Lab) parsePrecision(secondTime string) {
 	}
 
 	lab.precision = uint8(len(secondTime) - periodIndex - 1)
+}
+
+// Compare two slices to see if they are identical
+func isEqualSlice(slice1, slice2 []string) bool {
+	// if they aren't the same length, we return false right away
+	if len(slice1) != len(slice2) {
+		return false
+	}
+
+	// check and compare each element
+	for index, element := range slice1 {
+		if element != slice2[index] {
+			return false
+		}
+	}
+	return true
 }
