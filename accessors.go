@@ -24,22 +24,12 @@ func (lab *Lab) AppendAnnotations(annotations []Annotation) {
 	lab.annotations = append(lab.annotations, annotations...)
 }
 
-// Inserts an annotation at a specific index
-func (lab *Lab) InsertAnnotation(index int, annotation Annotation) {
-	lab.annotations = append(lab.annotations[:index], append([]Annotation{annotation}, lab.annotations[index:]...)...)
-}
-
-// Removes an annotation at a specific index
-func (lab *Lab) RemoveAnnotation(index int) {
-	lab.annotations = append(lab.annotations[:index], lab.annotations[index+1:]...)
-}
-
 // Removes all annotations from a lab object
 func (lab *Lab) ClearAnnotations() {
 	lab.annotations = []Annotation{}
 }
 
-// Dumps all labels in a lab object to an array
+// Dumps all labels in a lab object to a slice
 func (lab *Lab) DumpLabels() []string {
 	var result []string
 
@@ -70,21 +60,6 @@ func (lab *Lab) SetPrecision(precision uint8) {
 	lab.precision = precision
 }
 
-// Gets the denomination of a lab object
-func (lab *Lab) GetDenomination() *Denomination {
-	return lab.denomination
-}
-
-// Sets the denomination of a lab object
-func (lab *Lab) SetDenomination(denomination int8) {
-	lab.denomination = &Denomination{Denomination: denomination}
-}
-
-// Sets the denomination of a lab object to nil
-func (lab *Lab) ClearDenomination() {
-	lab.denomination = nil
-}
-
 // Gets the total duration of a lab by getting the difference in global start and end.
 func (lab Lab) GetDuration() (result float64) {
 	// calculate using start and end in case lab file doesnt start at 0
@@ -92,6 +67,11 @@ func (lab Lab) GetDuration() (result float64) {
 	end := lab.annotations[len(lab.annotations)-1].end
 
 	return end - start
+}
+
+// Gets the total amount of annotations in a lab file.
+func (lab Lab) GetLength() (result int) {
+	return len(lab.annotations)
 }
 
 ///
