@@ -240,7 +240,7 @@ func TestGettingLabDuration(t *testing.T) {
 	t.Log("getting lab duration successful!")
 }
 
-func TestingGettingLabLength(t *testing.T) {
+func TestGettingLabLength(t *testing.T) {
 	t.Log("test getting lab length...")
 
 	lab := ReadLab("examples/01.lab")
