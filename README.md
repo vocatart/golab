@@ -2,13 +2,11 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/vocatart/golab.svg)](https://pkg.go.dev/github.com/vocatart/golab)
 
-Simple HTK label reading and writing for go.
+simple HTK label reading and writing for go.
 
 ## example
 
-very scuffed and written in one day and also my first real open source project. expect it to be unstable
-
-todo: add better testing and error handling
+allows you to read and write annotation data from lab files that are in seconds. will automatically detect floating point preicision of a read file. can also view the data of individual annotations.
 
 ```go
 package main
@@ -20,6 +18,12 @@ func main() {
 
     fmt.Print("lab file %s, duration of %f, has %d labels.", lab.GetName(), lab.GetDuration(), lab.GetLength()) 
     fmt.Print(lab.ToString())
+
+    lab.WriteLab("path/to/new/lab.lab")
+
+    annotations = lab.GetAnnotations()
+
+    fmt.Print("annotation 0 has start time of %f, end time of %f, and label %s", annotations[0].GetStart(), annotations[0].GetEnd(), annotations.GetLabel())
 }
 ```
 
