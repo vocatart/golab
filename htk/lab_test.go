@@ -1,4 +1,4 @@
-package golab
+package htk
 
 import "testing"
 
@@ -15,7 +15,7 @@ func TestReadingLab(t *testing.T) {
 		t.Fatalf("wanted precision of 7, recieved %d", lab.precision)
 	}
 
-	t.Log("lab reading successfull!")
+	t.Log("lab reading successful!")
 }
 
 func TestReadingDifferentPrecision(t *testing.T) {
@@ -59,7 +59,7 @@ func TestPrintingLabString(t *testing.T) {
 		t.Fatal("malformed lab string!")
 	}
 
-	t.Log("printing lab to string succesful!")
+	t.Log("printing lab to string successful!")
 }
 
 func TestSettingAnnotations(t *testing.T) {
@@ -207,7 +207,7 @@ func TestGettingPrecision(t *testing.T) {
 		t.Fatalf("wanted precision %d, recieved %d", lab.precision, lab.GetPrecision())
 	}
 
-	t.Log("getting precision succesful!")
+	t.Log("getting precision successful!")
 }
 
 func TestSettingPrecision(t *testing.T) {

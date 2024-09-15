@@ -1,4 +1,4 @@
-package golab
+package htk
 
 import (
 	"bufio"
