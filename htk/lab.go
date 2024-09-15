@@ -18,6 +18,7 @@ type Annotation struct {
 }
 
 // A lab contains a collection of annotations.
+// The HTK Label format is defined at http://www.seas.ucla.edu/spapl/weichu/htkbook/node113_mn.html
 type Lab struct {
 	annotations []Annotation
 	name        string
