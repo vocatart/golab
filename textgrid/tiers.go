@@ -3,6 +3,7 @@ package textgrid
 import (
 	"fmt"
 	"slices"
+	"sort"
 )
 
 // A tier is an arbitrary type that can hold either intervals or points.
@@ -98,6 +99,7 @@ func (pTier *PointTier) SetName(name string) {
 
 // Sets xmin for tier `IntervalTier`
 func (iTier *IntervalTier) SetXmin(xmin float64, warn ...bool) error {
+
 	// default value of warn is true
 	if len(warn) == 0 {
 		warn = append(warn, true)
@@ -181,8 +183,7 @@ func (pTier *PointTier) SetXmax(xmax float64, warn ...bool) error {
 	largestValue := slices.Max(foundValues)
 
 	if warn[0] && largestValue < xmax {
-		xmaxError := fmt.Errorf("warning: you are trying to set xmax of %f when point value %f exists in current point tier", xmax, largestValue)
-		return xmaxError
+		return fmt.Errorf("warning: you are trying to set xmax of %f when point value %f exists in current point tier", xmax, largestValue)
 	}
 
 	pTier.xmax = xmax
@@ -210,10 +211,78 @@ func (pTier PointTier) GetPoints() []Point {
 }
 
 // Pushes an interval to the interval tier. Sorts intervals by minimum x value after pushing the interval.
-func (iTier *IntervalTier) PushInterval(interval Interval, warn ...bool) error {
+func (iTier *IntervalTier) PushInterval(intervalPush Interval, warn ...bool) error {
 
 	if len(warn) == 0 {
 		warn = append(warn, true)
 	}
 
+	if warn[0] && intervalPush.xmin < iTier.xmin {
+		return fmt.Errorf("warning: you are trying to push interval with xmin of %f but tier %s has existing xmin of %f", intervalPush.xmin, iTier.name, iTier.xmin)
+	}
+
+	iTier.intervals = append(iTier.intervals, intervalPush)
+	iTier.sort()
+
+	return nil
+}
+
+// Pushes a slice of intervals to the interval tier. SOrts intervals by minimum x value after pushing the intervals.
+func (iTier *IntervalTier) PushIntervals(intervalsPush []Interval, warn ...bool) error {
+
+	if len(warn) == 0 {
+		warn = append(warn, true)
+	}
+
+	if warn[0] {
+		for _, interval := range intervalsPush {
+			if interval.xmin < iTier.xmin {
+				return fmt.Errorf("warning: you are trying to push interval with xmin of %f but tier %s has existing xmin of %f", interval.xmin, iTier.name, iTier.xmin)
+			}
+		}
+	}
+
+	iTier.intervals = append(iTier.intervals, intervalsPush...)
+	iTier.sort()
+
+	return nil
+}
+
+// Sets all intervals of an interval tier. Checks for xmin and xmax mismatch, and sorts the modified interval tier.
+func (iTier *IntervalTier) SetIntervals(newIntervals []Interval, warn ...bool) error {
+
+	if len(warn) == 0 {
+		warn = append(warn, true)
+	}
+
+	if warn[0] {
+		for _, interval := range newIntervals {
+			if interval.xmin < iTier.xmin {
+				return fmt.Errorf("warning: you are trying to push interval with xmin of %f but tier %s has existing xmin of %f", interval.xmin, iTier.name, iTier.xmin)
+			} else if interval.xmax > iTier.xmax {
+				return fmt.Errorf("warning: you are trying to push interval with xmax of %f but tier %s has existing xmax of %f", interval.xmax, iTier.name, iTier.xmax)
+			}
+		}
+	}
+
+	iTier.intervals = newIntervals
+	iTier.sort()
+
+	return nil
+}
+
+// Checks for overlaps in an interval tier. Returns a slice of pairs of overlapping interval indicies, or nil.
+func (iTier IntervalTier) GetOverlapping() [][2]uint64 {
+	overlaps = [][2]uint64
+
+	for i, interval := range iTier.intervals {
+		nextInterval = iTier.intervals[i+1]
+	}
+}
+
+// reorder interval tier by xmins
+func (iTier *IntervalTier) sort() {
+	sort.Slice(iTier.intervals, func(i, j int) bool {
+		return iTier.intervals[i].xmin < iTier.intervals[j].xmin
+	})
 }
