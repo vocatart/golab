@@ -1,5 +1,10 @@
 package textgrid
 
+import (
+	"log"
+	"os"
+)
+
 type TextGrid struct {
 	xmin  float64
 	xmax  float64
@@ -39,4 +44,15 @@ func (tg *TextGrid) SetName(name string) {
 
 func (tg TextGrid) GetTiers() []Tier {
 	return tg.tiers
+}
+
+func ReadTextgrid(path string) TextGrid {
+	tg := TextGrid{}
+
+	tgData, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer tgData.Close()
+
 }
