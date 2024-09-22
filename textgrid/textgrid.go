@@ -6,3 +6,37 @@ type TextGrid struct {
 	tiers []Tier
 	name  string
 }
+
+// Returns xmin of TextGrid
+func (tg TextGrid) GetXmin() float64 {
+	return tg.xmin
+}
+
+// Sets xmin of TextGrid
+func (tg *TextGrid) SetXmin(xmin float64) {
+	tg.xmin = xmin
+}
+
+// Returns xmax of TextGrid
+func (tg TextGrid) GetXmax() float64 {
+	return tg.xmax
+}
+
+// Sets xmax of TextGrid
+func (tg *TextGrid) SetXmax(xmax float64) {
+	tg.xmax = xmax
+}
+
+// Returns name of TextGrid
+func (tg TextGrid) GetName() string {
+	return tg.name
+}
+
+// Sets name of TextGrid
+func (tg *TextGrid) SetName(name string) {
+	tg.name = name
+}
+
+func (tg TextGrid) GetTiers() []Tier {
+	return tg.tiers
+}
