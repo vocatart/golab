@@ -17,6 +17,7 @@ type Tier interface {
 	SetXmin(float64, ...bool) error
 	SetXmax(float64, ...bool) error
 	GetSize() int
+	sort()
 }
 
 // An interval tier holds a collection of intervals, along with a tier name and total duration.
@@ -271,18 +272,73 @@ func (iTier *IntervalTier) SetIntervals(newIntervals []Interval, warn ...bool) e
 	return nil
 }
 
-// Checks for overlaps in an interval tier. Returns a slice of pairs of overlapping interval indicies, or nil.
-func (iTier IntervalTier) GetOverlapping() [][2]uint64 {
-	overlaps = [][2]uint64
+// Checks for overlaps in an interval tier. Returns a 2d slide of overlapping interval indicies, or nil.
+func (iTier IntervalTier) GetOverlapping() [][]int {
 
+	overlaps := [][]int{}
+
+	// iterate over each pair of intervals, comparing the xmax to the next xmin (which should be the same)
 	for i, interval := range iTier.intervals {
-		nextInterval = iTier.intervals[i+1]
+		nextInterval := iTier.intervals[i+1]
+
+		if interval.xmax != nextInterval.xmin {
+			overlaps = append(overlaps, []int{i, i + 1})
+		}
 	}
+
+	if overlaps != nil {
+		return overlaps
+	} else {
+		return nil
+	}
+}
+
+func (pTier *PointTier) PushPoint(pointPush Point, warn ...bool) error {
+
+	if len(warn) == 0 {
+		warn = append(warn, true)
+	}
+
+	if pointPush.value < pTier.xmin && warn[0] {
+		return fmt.Errorf("warning: you are trying to push a point with value %f when tier %s has xmin of %f", pointPush.value, pTier.name, pTier.xmin)
+	}
+
+	pTier.points = append(pTier.points, pointPush)
+	pTier.sort()
+
+	return nil
+}
+
+func (pTier *PointTier) PushPoints(pointsPush []Point, warn ...bool) error {
+
+	if len(warn) == 0 {
+		warn = append(warn, true)
+	}
+
+	if warn[0] {
+		for i, point := range pointsPush {
+			if point.value < pTier.xmin {
+				return fmt.Errorf("warning: you are trying to push a point with value %f when tier %s has xmin of %f", pointsPush[i].value, pTier.name, pTier.xmin)
+			}
+		}
+	}
+
+	pTier.points = append(pTier.points, pointsPush...)
+	pTier.sort()
+
+	return nil
 }
 
 // reorder interval tier by xmins
 func (iTier *IntervalTier) sort() {
 	sort.Slice(iTier.intervals, func(i, j int) bool {
 		return iTier.intervals[i].xmin < iTier.intervals[j].xmin
+	})
+}
+
+// reorder point tier by point values
+func (pTier *PointTier) sort() {
+	sort.Slice(pTier.points, func(i, j int) bool {
+		return pTier.points[i].value < pTier.points[j].value
 	})
 }
