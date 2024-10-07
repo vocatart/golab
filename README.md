@@ -2,7 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/vocatart/golab.svg)](https://pkg.go.dev/github.com/vocatart/golab)
 
-simple HTK label reading and writing for go.
+simple HTK & TextGrid handling for go.
 
 ## example
 
@@ -11,7 +11,7 @@ allows you to read and write annotation data from lab files that are in seconds.
 ```go
 package main
 
-import "github.com/vocatart/golab"
+import "github.com/vocatart/golab/htk"
 
 func main() {
     lab = golab.ReadLab("path/to/file.lab")
@@ -27,4 +27,17 @@ func main() {
 }
 ```
 
+for textgrid, implementation is mostly there, but cannot write to files yet.
+
+```go
+package main
+
+import "github.com/vocatart/golab/textgrid"
+
+func main() {
+    tg = golab.ReadTextgrid("path/to/file.TextGrid")
+
+    fmt.Printf("textgrid file %s, duration of %f, has %d tiers.", tg.GetName(), tg.GetDuration(), tg.GetTiers().GetSize()) 
+}
+```
 some .lab examples taken from [kiritan_singing](https://github.com/mmorise/kiritan_singing).
