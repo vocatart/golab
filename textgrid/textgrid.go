@@ -175,7 +175,7 @@ func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[str
 			newPointTier := PointTier{name: tierName, xmin: tierXmin, xmax: tierXmax, points: points}
 			tiers = append(tiers, &newPointTier)
 		} else {
-			log.Fatalf("error: unexpected tier typeL %s", tierType)
+			log.Fatalf("error: unexpected tier type %s", tierType)
 		}
 		tierCounter++
 	}
