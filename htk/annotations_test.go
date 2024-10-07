@@ -1,4 +1,4 @@
-package golab
+package htk
 
 import "testing"
 
@@ -10,10 +10,10 @@ func TestGettingAnnotationDuration(t *testing.T) {
 	trueDuration := annotation.end - annotation.start
 
 	if annotation.GetDuration() != trueDuration {
-		t.Fatalf("wanted duration %f, recieved %f", trueDuration, annotation.GetDuration())
+		t.Fatalf("wanted duration %f, received %f", trueDuration, annotation.GetDuration())
 	}
 
-	t.Log("getting annotation duration succesful!")
+	t.Log("getting annotation duration successful!")
 }
 
 func TestGettingAnnotationStart(t *testing.T) {
@@ -23,10 +23,10 @@ func TestGettingAnnotationStart(t *testing.T) {
 	trueStart := annotation.start
 
 	if annotation.GetStart() != trueStart {
-		t.Fatalf("wanted start time of %f, recieved %f", trueStart, annotation.GetStart())
+		t.Fatalf("wanted start time of %f, received %f", trueStart, annotation.GetStart())
 	}
 
-	t.Log("getting annotation start succesful!")
+	t.Log("getting annotation start successful!")
 }
 
 func TestGettingAnnotationEnd(t *testing.T) {
@@ -36,7 +36,7 @@ func TestGettingAnnotationEnd(t *testing.T) {
 	trueEnd := annotation.end
 
 	if annotation.GetEnd() != trueEnd {
-		t.Fatalf("wanted end time of %f, recieved %f", trueEnd, annotation.GetEnd())
+		t.Fatalf("wanted end time of %f, received %f", trueEnd, annotation.GetEnd())
 	}
 
 	t.Log("getting annotation end successful!")
@@ -49,7 +49,7 @@ func TestGettingAnnotationLabel(t *testing.T) {
 	trueLabel := annotation.label
 
 	if annotation.GetLabel() != trueLabel {
-		t.Fatalf("wanted label %s, recieved %s", trueLabel, annotation.GetLabel())
+		t.Fatalf("wanted label %s, received %s", trueLabel, annotation.GetLabel())
 	}
 
 	t.Log("test setting annotation label successful!")
@@ -63,9 +63,9 @@ func TestSettingAnnotationStartEnd(t *testing.T) {
 	annotation.SetEnd(20)
 
 	if annotation.start != 10 {
-		t.Fatalf("wanted start time of 10, recieved %f", annotation.start)
+		t.Fatalf("wanted start time of 10, received %f", annotation.start)
 	} else if annotation.end != 20 {
-		t.Fatalf("wanted end time of 20, recieved %f", annotation.end)
+		t.Fatalf("wanted end time of 20, received %f", annotation.end)
 	}
 
 	t.Log("setting annotation start and end successful!")
