@@ -1,7 +1,6 @@
 package textgrid
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -104,12 +103,12 @@ func ReadTextgrid(path string) TextGrid {
 
 	tg.tiers = parseTiers(globalXmin, globalXmax, tgDeque, numTiers)
 
-	for _, thing := range tg.tiers {
-		fmt.Println(thing)
-	}
-
 	return tg
 }
+
+// TODO: Implement
+// func (tg TextGrid) WriteLong(path string, overwrite ...bool) {
+// }
 
 func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[string], numTiers int) []Tier {
 	tiers := []Tier{}
