@@ -2,13 +2,14 @@ package textgrid
 
 import (
 	"log"
-	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 
+	"github.com/TomOnTime/utfutil"
 	"github.com/gammazero/deque"
+	"github.com/saintfish/chardet"
 )
 
 type TextGrid struct {
@@ -62,16 +63,21 @@ func ReadTextgrid(path string) TextGrid {
 	tg.name = filepath.Base(path)
 
 	// check if the file exists
-	// reading into memory is alot easier than line-by-line with textgrids
-	tgData, err := os.ReadFile(path)
+	// TextGrid files are USUALLY UTF-8, UTF-16, or ASCII.
+	tgData, err := utfutil.ReadFile(path, utfutil.UTF8)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// process the textgrid data into a slice of machine-friendly strings
-	tgContent := processContent(tgData)
+	// if somehow utfutil finds something else, error out
+	// chardet will sometimes read ASCII as ISO-8859-1, which go will always interpret correctly when casting its byte slice to a string.
+	retrievedEncoding := getEncoding(tgData)
+	if retrievedEncoding != "UTF-8" && retrievedEncoding != "ISO-8859-1" {
+		log.Fatalf("error: encoding out of scope, recieved %q encoding for %q", getEncoding(tgData), tg.name)
+	}
 
 	// convert string slice into deque
+	tgContent := processContent(tgData)
 	for _, str := range tgContent {
 		tgDeque.PushBack(str)
 	}
@@ -186,6 +192,7 @@ func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[str
 // turns textgrid file content into a slice of useable strings.
 // internally, any textgrid given is converted into a "short" type textgrid with any empty lines removed
 func processContent(data []byte) []string {
+
 	// remove all empty lines
 	tgString := strings.ReplaceAll(string(data), "\n\n", "\n")
 
@@ -253,4 +260,15 @@ func pullFloat(str string) float64 {
 	}
 
 	return result
+}
+
+func getEncoding(data []byte) string {
+	detector := chardet.NewTextDetector()
+
+	detectedEncoding, err := detector.DetectBest(data)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return detectedEncoding.Charset
 }
