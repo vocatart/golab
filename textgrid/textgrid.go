@@ -78,7 +78,7 @@ func ReadTextgrid(path string) TextGrid {
 
 	// verify the first two entries in the deque
 	if !verifyHead(tgDeque) {
-		log.Fatal("malformed textgrid at head!")
+		log.Fatalf("error: textgrid %s has malformed header", tg.name)
 	}
 
 	// pop the next two values, which should be xmin and xmax respectively.
