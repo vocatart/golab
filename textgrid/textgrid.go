@@ -73,7 +73,7 @@ func ReadTextgrid(path string) TextGrid {
 	// chardet will sometimes read ASCII as ISO-8859-1, which go will always interpret correctly when casting its byte slice to a string.
 	retrievedEncoding := getEncoding(tgData)
 	if retrievedEncoding != "UTF-8" && retrievedEncoding != "ISO-8859-1" {
-		log.Fatalf("error: encoding out of scope, recieved %q encoding for %q", getEncoding(tgData), tg.name)
+		log.Fatalf("error: encoding out of scope, recieved %q encoding for %q", retrievedEncoding, tg.name)
 	}
 
 	// convert string slice into deque
