@@ -54,6 +54,36 @@ func (tg TextGrid) GetTiers() []Tier {
 	return tg.tiers
 }
 
+// Returns true if TextGrid has IntervalTier
+func (tg TextGrid) HasIntervalTier() bool {
+	for _, tier := range tg.tiers {
+		if tier.TierType() == "IntervalTier" {
+			return true
+		}
+	}
+	return false
+}
+
+// Returns true if TextGrid has PointTier
+func (tg TextGrid) HasPointTier() bool {
+	for _, tier := range tg.tiers {
+		if tier.TierType() == "PointTier" {
+			return true
+		}
+	}
+	return false
+}
+
+// Returns tier with given name, if it exists
+func (tg TextGrid) GetTier(name string) Tier {
+	for _, tier := range tg.tiers {
+		if tier.TierName() == name {
+			return tier
+		}
+	}
+	return nil
+}
+
 // Takes a path to a .TextGrid file and reads its contents into a TextGrid.
 func ReadTextgrid(path string) TextGrid {
 	tg := TextGrid{}

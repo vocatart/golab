@@ -16,7 +16,12 @@ type Tier interface {
 	SetName(string)
 	SetXmin(float64, ...bool) error
 	SetXmax(float64, ...bool) error
-	GetSize() int
+	GetIntervals() []Interval
+	GetPoints() []Point
+	PushInterval(Interval, ...bool) error
+	PushIntervals([]Interval, ...bool) error
+	PushPoint(Point, ...bool) error
+	PushPoints([]Point, ...bool) error
 	sort()
 }
 
@@ -206,9 +211,39 @@ func (iTier IntervalTier) GetIntervals() []Interval {
 	return iTier.intervals
 }
 
+// GetPoints implements Tier.
+func (iTier *IntervalTier) GetPoints() []Point {
+	panic("not point tier")
+}
+
+// PushPoint implements Tier.
+func (iTier *IntervalTier) PushPoint(Point, ...bool) error {
+	panic("not point tier")
+}
+
+// PushPoints implements Tier.
+func (iTier *IntervalTier) PushPoints([]Point, ...bool) error {
+	panic("not point tier")
+}
+
 // Returns slice of points from a `PointTier`
 func (pTier PointTier) GetPoints() []Point {
 	return pTier.points
+}
+
+// GetIntervals implements Tier.
+func (pTier *PointTier) GetIntervals() []Interval {
+	panic("not interval tier")
+}
+
+// PushInterval implements Tier.
+func (pTier *PointTier) PushInterval(Interval, ...bool) error {
+	panic("not interval tier")
+}
+
+// PushIntervals implements Tier.
+func (pTier *PointTier) PushIntervals([]Interval, ...bool) error {
+	panic("not interval tier")
 }
 
 // Pushes an interval to the interval tier. Sorts intervals by minimum x value after pushing the interval.
