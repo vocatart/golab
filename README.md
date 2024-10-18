@@ -1,6 +1,7 @@
 # golab
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/vocatart/golab.svg)](https://pkg.go.dev/github.com/vocatart/golab)
+![go test](https://github.com/vocatart/golab/actions/workflows/go.yml/badge.svg)
 
 simple HTK & TextGrid handling for go.
 
