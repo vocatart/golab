@@ -16,12 +16,15 @@ type Tier interface {
 	SetName(string)
 	SetXmin(float64, ...bool) error
 	SetXmax(float64, ...bool) error
+	SetIntervals([]Interval, ...bool) error
 	GetIntervals() []Interval
 	GetPoints() []Point
 	PushInterval(Interval, ...bool) error
 	PushIntervals([]Interval, ...bool) error
 	PushPoint(Point, ...bool) error
 	PushPoints([]Point, ...bool) error
+	GetSize() int
+	GetOverlapping() [][]int
 	sort()
 }
 
@@ -263,7 +266,7 @@ func (iTier *IntervalTier) PushInterval(intervalPush Interval, warn ...bool) err
 	return nil
 }
 
-// Pushes a slice of intervals to the interval tier. SOrts intervals by minimum x value after pushing the intervals.
+// Pushes a slice of intervals to the interval tier. Sorts intervals by minimum x value after pushing the intervals.
 func (iTier *IntervalTier) PushIntervals(intervalsPush []Interval, warn ...bool) error {
 
 	if len(warn) == 0 {
@@ -305,6 +308,16 @@ func (iTier *IntervalTier) SetIntervals(newIntervals []Interval, warn ...bool) e
 	iTier.sort()
 
 	return nil
+}
+
+// SetIntervals implements Tier.
+func (pTier *PointTier) SetIntervals([]Interval, ...bool) error {
+	panic("not interval tier")
+}
+
+// GetOverlapping implements Tier.
+func (pTier *PointTier) GetOverlapping() [][]int {
+	panic("not interval tier")
 }
 
 // Checks for overlaps in an interval tier. Returns a 2d slide of overlapping interval indicies, or nil.
