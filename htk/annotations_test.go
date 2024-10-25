@@ -6,7 +6,12 @@ func TestGettingAnnotationDuration(t *testing.T) {
 	t.Log("test getting annotation duration...")
 
 	// loading the first annotation from the first example as a dummy annotation
-	annotation := ReadLab("examples/01.lab").annotations[0]
+	lab, err := ReadLab("examples/01.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	annotation := lab.annotations[0]
 	trueDuration := annotation.end - annotation.start
 
 	if annotation.GetDuration() != trueDuration {
@@ -19,7 +24,12 @@ func TestGettingAnnotationDuration(t *testing.T) {
 func TestGettingAnnotationStart(t *testing.T) {
 	t.Log("test getting annotation start...")
 
-	annotation := ReadLab("examples/01.lab").annotations[0]
+	lab, err := ReadLab("examples/01.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	annotation := lab.annotations[0]
 	trueStart := annotation.start
 
 	if annotation.GetStart() != trueStart {
@@ -32,7 +42,12 @@ func TestGettingAnnotationStart(t *testing.T) {
 func TestGettingAnnotationEnd(t *testing.T) {
 	t.Log("test getting annotation end...")
 
-	annotation := ReadLab("examples/01.lab").annotations[0]
+	lab, err := ReadLab("examples/01.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	annotation := lab.annotations[0]
 	trueEnd := annotation.end
 
 	if annotation.GetEnd() != trueEnd {
@@ -45,7 +60,12 @@ func TestGettingAnnotationEnd(t *testing.T) {
 func TestGettingAnnotationLabel(t *testing.T) {
 	t.Log("test getting annotation label...")
 
-	annotation := ReadLab("examples/01.lab").annotations[0]
+	lab, err := ReadLab("examples/01.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	annotation := lab.annotations[0]
 	trueLabel := annotation.label
 
 	if annotation.GetLabel() != trueLabel {
@@ -58,7 +78,12 @@ func TestGettingAnnotationLabel(t *testing.T) {
 func TestSettingAnnotationStartEnd(t *testing.T) {
 	t.Log("test setting annotation start and end...")
 
-	annotation := ReadLab("examples/01.lab").annotations[0]
+	lab, err := ReadLab("examples/01.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	annotation := lab.annotations[0]
 	annotation.SetStart(10)
 	annotation.SetEnd(20)
 
@@ -74,7 +99,12 @@ func TestSettingAnnotationStartEnd(t *testing.T) {
 func TestSettingAnnotationLabel(t *testing.T) {
 	t.Log("test setting annotaiton label...")
 
-	annotation := ReadLab("examples/01.lab").annotations[0]
+	lab, err := ReadLab("examples/01.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	annotation := lab.annotations[0]
 	annotation.SetLabel("label")
 
 	if annotation.label != "label" {

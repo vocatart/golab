@@ -5,7 +5,10 @@ import "testing"
 func TestReadingLab(t *testing.T) {
 	t.Log("test lab reading...")
 
-	lab := ReadLab("examples/short.lab")
+	lab, err := ReadLab("examples/short.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if lab.name != "short.lab" {
 		t.Fatalf("wanted 'short', recieved %s", lab.name)
@@ -21,7 +24,10 @@ func TestReadingLab(t *testing.T) {
 func TestReadingDifferentPrecision(t *testing.T) {
 	t.Log("test reading different precisions...")
 
-	lab := ReadLab("examples/02.lab")
+	lab, err := ReadLab("examples/02.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if lab.precision != 6 {
 		t.Fatalf("wanted precision of 6, recieved %d", lab.precision)
@@ -33,7 +39,10 @@ func TestReadingDifferentPrecision(t *testing.T) {
 func TestWritingLab(t *testing.T) {
 	t.Log("test writing lab...")
 
-	lab := ReadLab("examples/01.lab")
+	lab, err := ReadLab("examples/01.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	lab.WriteLab("examples/output.lab", true)
 
@@ -43,7 +52,10 @@ func TestWritingLab(t *testing.T) {
 func TestWritingDifferentPrecision(t *testing.T) {
 	t.Log("test writing different precision...")
 
-	lab := ReadLab("examples/02.lab")
+	lab, err := ReadLab("examples/02.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	lab.WriteLab("examples/output2.lab", true)
 
@@ -53,9 +65,12 @@ func TestWritingDifferentPrecision(t *testing.T) {
 func TestPrintingLabString(t *testing.T) {
 	t.Log("test priting lab to string...")
 
-	lab := ReadLab("examples/one_line.lab").ToString()
+	lab, err := ReadLab("examples/one_line.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	if lab != "0.0000000 10.0000000 test\n" {
+	if lab.ToString() != "0.0000000 10.0000000 test\n" {
 		t.Fatal("malformed lab string!")
 	}
 
@@ -83,7 +98,10 @@ func TestSettingAnnotations(t *testing.T) {
 func TestGettingAnnotations(t *testing.T) {
 	t.Log("test getting annotations...")
 
-	lab := ReadLab("examples/short.lab")
+	lab, err := ReadLab("examples/short.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if lab.annotations[0].start != 0 {
 		t.Fatalf("incorrect annotation start time! wanted 0, recieved %f", lab.annotations[0].start)
@@ -99,7 +117,10 @@ func TestGettingAnnotations(t *testing.T) {
 func TestPushingAnnotation(t *testing.T) {
 	t.Log("test pushing annotations...")
 
-	lab := ReadLab("examples/short.lab")
+	lab, err := ReadLab("examples/short.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	lab.PushAnnotation(Annotation{start: 20, end: 30, label: "new_annotation"})
 
@@ -117,7 +138,10 @@ func TestPushingAnnotation(t *testing.T) {
 func TestAppendingAnnotations(t *testing.T) {
 	t.Log("test appending annotations...")
 
-	lab := ReadLab("examples/short.lab")
+	lab, err := ReadLab("examples/short.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	lab.AppendAnnotations([]Annotation{
 		{start: 20, end: 30, label: "new_annotation"},
@@ -146,7 +170,10 @@ func TestAppendingAnnotations(t *testing.T) {
 func TestClearingAnnotations(t *testing.T) {
 	t.Log("test clearing annotations...")
 
-	lab := ReadLab("examples/short.lab")
+	lab, err := ReadLab("examples/short.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	lab.ClearAnnotations()
 
@@ -160,7 +187,10 @@ func TestClearingAnnotations(t *testing.T) {
 func TestDumpingLabels(t *testing.T) {
 	t.Log("test dumping annotations...")
 
-	lab := ReadLab("examples/short.lab")
+	lab, err := ReadLab("examples/short.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 	labSlice := lab.DumpLabels()
 
 	groundTruthSlice := []string{"test", "test2"}
@@ -175,7 +205,10 @@ func TestDumpingLabels(t *testing.T) {
 func TestGettingLabName(t *testing.T) {
 	t.Log("test getting lab name...")
 
-	lab := ReadLab("examples/short.lab")
+	lab, err := ReadLab("examples/short.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if lab.GetName() != lab.name {
 		t.Fatalf("wanted lab name %s, recieved %s", lab.name, lab.GetName())
@@ -187,7 +220,10 @@ func TestGettingLabName(t *testing.T) {
 func TestSettingLabName(t *testing.T) {
 	t.Log("test setting lab name...")
 
-	lab := ReadLab("examples/short.lab")
+	lab, err := ReadLab("examples/short.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	lab.SetName("newName")
 
@@ -201,7 +237,10 @@ func TestSettingLabName(t *testing.T) {
 func TestGettingPrecision(t *testing.T) {
 	t.Log("test getting precision...")
 
-	lab := ReadLab("examples/01.lab")
+	lab, err := ReadLab("examples/01.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if lab.GetPrecision() != lab.precision {
 		t.Fatalf("wanted precision %d, recieved %d", lab.precision, lab.GetPrecision())
@@ -213,7 +252,10 @@ func TestGettingPrecision(t *testing.T) {
 func TestSettingPrecision(t *testing.T) {
 	t.Log("test setting precision...")
 
-	lab := ReadLab("examples/01.lab")
+	lab, err := ReadLab("examples/01.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	lab.SetPrecision(6)
 
@@ -229,7 +271,10 @@ func TestSettingPrecision(t *testing.T) {
 func TestGettingLabDuration(t *testing.T) {
 	t.Log("test getting lab duration...")
 
-	lab := ReadLab("examples/short.lab")
+	lab, err := ReadLab("examples/short.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	trueDuration := lab.annotations[len(lab.annotations)-1].end
 
@@ -243,7 +288,10 @@ func TestGettingLabDuration(t *testing.T) {
 func TestGettingLabLength(t *testing.T) {
 	t.Log("test getting lab length...")
 
-	lab := ReadLab("examples/01.lab")
+	lab, err := ReadLab("examples/01.lab")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	trueLength := len(lab.annotations)
 

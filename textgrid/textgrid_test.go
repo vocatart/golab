@@ -3,17 +3,29 @@ package textgrid
 import "testing"
 
 func TestReadingTextgridASCIILong(t *testing.T) {
-	ReadTextgrid("examples/long.TextGrid")
+	_, err := ReadTextgrid("examples/long.TextGrid")
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 func TestReadingTextgridASCIIShort(t *testing.T) {
-	ReadTextgrid("examples/short.TextGrid")
+	_, err := ReadTextgrid("examples/short.TextGrid")
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 func TestReadingTextgridUTF16(t *testing.T) {
-	ReadTextgrid("examples/polish64.TextGrid")
+	_, err := ReadTextgrid("examples/polish64.TextGrid")
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 func TestReadingTextgridUTF8(t *testing.T) {
-	ReadTextgrid("examples/polish65.TextGrid")
+	_, err := ReadTextgrid("examples/polish65.TextGrid")
+	if err != nil {
+		t.Error(err)
+	}
 }

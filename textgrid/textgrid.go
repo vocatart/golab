@@ -1,6 +1,7 @@
 package textgrid
 
 import (
+	"fmt"
 	"log"
 	"path/filepath"
 	"regexp"
@@ -85,7 +86,7 @@ func (tg TextGrid) GetTier(name string) Tier {
 }
 
 // Takes a path to a .TextGrid file and reads its contents into a TextGrid.
-func ReadTextgrid(path string) TextGrid {
+func ReadTextgrid(path string) (TextGrid, error) {
 	tg := TextGrid{}
 	tgDeque := deque.New[string]()
 
@@ -96,14 +97,14 @@ func ReadTextgrid(path string) TextGrid {
 	// TextGrid files are USUALLY UTF-8, UTF-16, or ASCII.
 	tgData, err := utfutil.ReadFile(path, utfutil.UTF8)
 	if err != nil {
-		log.Fatal(err)
+		return tg, err
 	}
 
 	// if somehow utfutil finds something else, error out
 	// chardet will sometimes read ASCII as ISO-8859-1, which go will always interpret correctly when casting its byte slice to a string.
 	retrievedEncoding := getEncoding(tgData)
 	if retrievedEncoding != "UTF-8" && retrievedEncoding != "ISO-8859-1" {
-		log.Fatalf("error: encoding out of scope, recieved %q encoding for %q", retrievedEncoding, tg.name)
+		return tg, fmt.Errorf("error: encoding out of scope, recieved %q encoding for %q", retrievedEncoding, tg.name)
 	}
 
 	// convert string slice into deque
@@ -114,7 +115,7 @@ func ReadTextgrid(path string) TextGrid {
 
 	// verify the first two entries in the deque
 	if !verifyHead(tgDeque) {
-		log.Fatalf("error: textgrid %s has malformed header", tg.name)
+		return tg, fmt.Errorf("error: textgrid %s has malformed header", tg.name)
 	}
 
 	// pop the next two values, which should be xmin and xmax respectively.
@@ -129,9 +130,9 @@ func ReadTextgrid(path string) TextGrid {
 	tierStatus := pullBracketedValue(tgDeque.PopFront())
 	if tierStatus == "absent" {
 		log.Println("warning: tierStatus is <absent>, a textgrid with 0 tiers will be returned")
-		return tg
+		return tg, nil
 	} else if tierStatus != "exists" {
-		log.Fatalf("error: expected tier status <exists> or <absent>, recieved <%s>", tierStatus)
+		return tg, fmt.Errorf("error: expected tier status <exists> or <absent>, recieved <%s>", tierStatus)
 	}
 
 	// get the number of tiers that exist in this textgrid
@@ -139,7 +140,7 @@ func ReadTextgrid(path string) TextGrid {
 
 	tg.tiers = parseTiers(globalXmin, globalXmax, tgDeque, numTiers)
 
-	return tg
+	return tg, nil
 }
 
 // TODO: Implement

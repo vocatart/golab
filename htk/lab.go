@@ -89,14 +89,14 @@ func (lab Lab) GetLength() (result int) {
 }
 
 // Takes a path to a .lab file and reads its contents into a Lab.
-func ReadLab(path string) (result Lab) {
+func ReadLab(path string) (Lab, error) {
 	lab := Lab{}
 	parsedPrecision := false
 
 	// check if the file exists
 	labData, err := os.Open(path)
 	if err != nil {
-		log.Fatal(err)
+		return lab, err
 	}
 	defer labData.Close()
 
@@ -108,7 +108,7 @@ func ReadLab(path string) (result Lab) {
 
 		// the lab is malformed if there are less than 3 elements per line
 		if len(labLine) < 3 {
-			log.Fatal("malformed lab file")
+			return lab, fmt.Errorf("error: malformed lab file %s", path)
 		}
 
 		// parse the precision if it hasnt been parsed yet
@@ -120,11 +120,11 @@ func ReadLab(path string) (result Lab) {
 		// parse the start and end times
 		start, err := strconv.ParseFloat(labLine[0], 64)
 		if err != nil {
-			log.Fatal(err)
+			return lab, err
 		}
 		end, err := strconv.ParseFloat(labLine[1], 64)
 		if err != nil {
-			log.Fatal(err)
+			return lab, err
 		}
 
 		// join the rest of the line into a single string and add it to the annotations
@@ -134,7 +134,7 @@ func ReadLab(path string) (result Lab) {
 
 	lab.name = filepath.Base(path)
 
-	return lab
+	return lab, err
 }
 
 // Writes a lab to a file from a given path. If the file already exists, it will be overwritten unless overwrite is set to false.
