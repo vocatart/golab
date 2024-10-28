@@ -87,7 +87,7 @@ func (tg *TextGrid) GetTier(name string) Tier {
 
 // ReadTextgrid - Takes a path to a .TextGrid file and reads its contents into a TextGrid.
 func ReadTextgrid(path string) (TextGrid, error) {
-	tg := TextGrid{}
+	var tg = TextGrid{}
 	tgDeque := deque.New[string]()
 
 	// grab the name element from the path
@@ -138,7 +138,11 @@ func ReadTextgrid(path string) (TextGrid, error) {
 	// get the number of tiers that exist in this textgrid
 	numTiers := pullInt(tgDeque.PopFront())
 
-	tg.tiers = parseTiers(globalXmin, globalXmax, tgDeque, numTiers)
+	tiers, err := parseTiers(globalXmin, globalXmax, tgDeque, numTiers)
+	if err != nil {
+		return tg, err
+	}
+	tg.tiers = tiers
 
 	return tg, nil
 }
@@ -147,7 +151,7 @@ func ReadTextgrid(path string) (TextGrid, error) {
 // func (tg TextGrid) WriteLong(path string, overwrite ...bool) {
 // }
 
-func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[string], numTiers int) []Tier {
+func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[string], numTiers int) ([]Tier, error) {
 	var tiers []Tier
 	tierCounter := 0
 
@@ -162,10 +166,10 @@ func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[str
 
 		// check to see if any boundaries are inconsistent
 		if tierXmin < globalXmin {
-			log.Fatalf("error: %s %s has xmin %f, when TextGrid xmin is %f", tierType, tierName, tierXmin, globalXmin)
+			return nil, fmt.Errorf("error: %s %s has xmin %f, when TextGrid xmin is %f", tierType, tierName, tierXmin, globalXmin)
 		}
 		if tierXmax > globalXmax {
-			log.Fatalf("error: %s %s has xmax %f, when TextGrid xmax is %f", tierType, tierName, tierXmax, globalXmax)
+			return nil, fmt.Errorf("error: %s %s has xmax %f, when TextGrid xmax is %f", tierType, tierName, tierXmax, globalXmax)
 		}
 
 		// the last value before the intervals/points begin should be the number of intervals/points in the unique tier
@@ -212,12 +216,12 @@ func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[str
 			newPointTier := PointTier{name: tierName, xmin: tierXmin, xmax: tierXmax, points: points}
 			tiers = append(tiers, &newPointTier)
 		} else {
-			log.Fatalf("error: unexpected tier type %s", tierType)
+			return nil, fmt.Errorf("error: unexpected tier type %s", tierType)
 		}
 		tierCounter++
 	}
 
-	return tiers
+	return tiers, nil
 }
 
 // turns textgrid file content into a slice of usable strings.
