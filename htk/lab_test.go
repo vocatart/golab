@@ -3,8 +3,6 @@ package htk
 import "testing"
 
 func TestReadingLab(t *testing.T) {
-	t.Log("test lab reading...")
-
 	lab, err := ReadLab("examples/short.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -22,8 +20,6 @@ func TestReadingLab(t *testing.T) {
 }
 
 func TestReadingDifferentPrecision(t *testing.T) {
-	t.Log("test reading different precisions...")
-
 	lab, err := ReadLab("examples/02.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -37,34 +33,34 @@ func TestReadingDifferentPrecision(t *testing.T) {
 }
 
 func TestWritingLab(t *testing.T) {
-	t.Log("test writing lab...")
-
 	lab, err := ReadLab("examples/01.lab")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	lab.WriteLab("examples/output.lab", true)
+	err = lab.WriteLab("examples/output.lab", true)
+	if err != nil {
+		return
+	}
 
 	t.Log("lab writing successful!")
 }
 
 func TestWritingDifferentPrecision(t *testing.T) {
-	t.Log("test writing different precision...")
-
 	lab, err := ReadLab("examples/02.lab")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	lab.WriteLab("examples/output2.lab", true)
+	err = lab.WriteLab("examples/output2.lab", true)
+	if err != nil {
+		return
+	}
 
 	t.Log("different pricision writing successful!")
 }
 
 func TestPrintingLabString(t *testing.T) {
-	t.Log("test priting lab to string...")
-
 	lab, err := ReadLab("examples/one_line.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -78,10 +74,7 @@ func TestPrintingLabString(t *testing.T) {
 }
 
 func TestSettingAnnotations(t *testing.T) {
-	t.Log("test setting annotations...")
-
 	lab := Lab{}
-
 	lab.SetAnnotations([]Annotation{
 		{start: 0, end: 1, label: "test1"},
 		{start: 1, end: 2, label: "test2"},
@@ -96,8 +89,6 @@ func TestSettingAnnotations(t *testing.T) {
 }
 
 func TestGettingAnnotations(t *testing.T) {
-	t.Log("test getting annotations...")
-
 	lab, err := ReadLab("examples/short.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -115,8 +106,6 @@ func TestGettingAnnotations(t *testing.T) {
 }
 
 func TestPushingAnnotation(t *testing.T) {
-	t.Log("test pushing annotations...")
-
 	lab, err := ReadLab("examples/short.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -136,8 +125,6 @@ func TestPushingAnnotation(t *testing.T) {
 }
 
 func TestAppendingAnnotations(t *testing.T) {
-	t.Log("test appending annotations...")
-
 	lab, err := ReadLab("examples/short.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -168,8 +155,6 @@ func TestAppendingAnnotations(t *testing.T) {
 }
 
 func TestClearingAnnotations(t *testing.T) {
-	t.Log("test clearing annotations...")
-
 	lab, err := ReadLab("examples/short.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -185,8 +170,6 @@ func TestClearingAnnotations(t *testing.T) {
 }
 
 func TestDumpingLabels(t *testing.T) {
-	t.Log("test dumping annotations...")
-
 	lab, err := ReadLab("examples/short.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -203,8 +186,6 @@ func TestDumpingLabels(t *testing.T) {
 }
 
 func TestGettingLabName(t *testing.T) {
-	t.Log("test getting lab name...")
-
 	lab, err := ReadLab("examples/short.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -218,8 +199,6 @@ func TestGettingLabName(t *testing.T) {
 }
 
 func TestSettingLabName(t *testing.T) {
-	t.Log("test setting lab name...")
-
 	lab, err := ReadLab("examples/short.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -235,8 +214,6 @@ func TestSettingLabName(t *testing.T) {
 }
 
 func TestGettingPrecision(t *testing.T) {
-	t.Log("test getting precision...")
-
 	lab, err := ReadLab("examples/01.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -250,8 +227,6 @@ func TestGettingPrecision(t *testing.T) {
 }
 
 func TestSettingPrecision(t *testing.T) {
-	t.Log("test setting precision...")
-
 	lab, err := ReadLab("examples/01.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -263,14 +238,15 @@ func TestSettingPrecision(t *testing.T) {
 		t.Fatalf("wanted precision 6, recieved %d", lab.precision)
 	}
 
-	lab.WriteLab("examples/output3.lab", true)
+	err = lab.WriteLab("examples/output3.lab", true)
+	if err != nil {
+		return
+	}
 
 	t.Log("setting precision successful!")
 }
 
 func TestGettingLabDuration(t *testing.T) {
-	t.Log("test getting lab duration...")
-
 	lab, err := ReadLab("examples/short.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -286,8 +262,6 @@ func TestGettingLabDuration(t *testing.T) {
 }
 
 func TestGettingLabLength(t *testing.T) {
-	t.Log("test getting lab length...")
-
 	lab, err := ReadLab("examples/01.lab")
 	if err != nil {
 		t.Fatal(err)

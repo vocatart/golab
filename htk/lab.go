@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// A lab contains a collection of annotations.
+// Lab objects contain a collection of annotations.
 // The HTK Label format is defined at http://www.seas.ucla.edu/spapl/weichu/htkbook/node113_mn.html
 type Lab struct {
 	annotations []Annotation
@@ -18,32 +18,32 @@ type Lab struct {
 	precision   uint8
 }
 
-// Sets the annotations of a lab object
+// SetAnnotations sets the annotations of a lab object.
 func (lab *Lab) SetAnnotations(annotations []Annotation) {
 	lab.annotations = annotations
 }
 
-// Gets the annotations of a lab object
-func (lab Lab) GetAnnotations() []Annotation {
+// GetAnnotations gets the annotations of a lab object.
+func (lab *Lab) GetAnnotations() []Annotation {
 	return lab.annotations
 }
 
-// Pushes an annotation to the end of a lab object
+// PushAnnotation pushes an annotation to the end of a lab object.
 func (lab *Lab) PushAnnotation(annotation Annotation) {
 	lab.annotations = append(lab.annotations, annotation)
 }
 
-// Appends an annotations object to the end of a lab object
+// AppendAnnotations appends an annotations object to the end of a lab object.
 func (lab *Lab) AppendAnnotations(annotations []Annotation) {
 	lab.annotations = append(lab.annotations, annotations...)
 }
 
-// Removes all annotations from a lab object
+// ClearAnnotations removes all annotations from a lab object.
 func (lab *Lab) ClearAnnotations() {
 	lab.annotations = []Annotation{}
 }
 
-// Dumps all labels in a lab object to a slice
+// DumpLabels gets all labels in a lab object to a slice.
 func (lab *Lab) DumpLabels() []string {
 	var result []string
 
@@ -54,41 +54,41 @@ func (lab *Lab) DumpLabels() []string {
 	return result
 }
 
-// Gets the name of a lab object
-func (lab Lab) GetName() string {
+// GetName gets the name of a lab object.
+func (lab *Lab) GetName() string {
 	return lab.name
 }
 
-// Sets the name of a lab object
+// SetName sets the name of a lab object.
 func (lab *Lab) SetName(name string) {
 	lab.name = name
 }
 
-// Gets the precision of a lab object
-func (lab Lab) GetPrecision() uint8 {
+// GetPrecision gets the precision of a lab object
+func (lab *Lab) GetPrecision() uint8 {
 	return lab.precision
 }
 
-// Sets the precision of a lab object
+// SetPrecision sets the precision of a lab object.
 func (lab *Lab) SetPrecision(precision uint8) {
 	lab.precision = precision
 }
 
-// Gets the total duration of a lab by getting the difference in global start and end.
-func (lab Lab) GetDuration() (result float64) {
-	// calculate using start and end in case lab file doesnt start at 0
+// GetDuration gets the total duration of a lab by getting the difference in global start and end.
+func (lab *Lab) GetDuration() (result float64) {
+	// calculate using start and end in case lab file doesn't start at 0
 	start := lab.annotations[0].start
 	end := lab.annotations[len(lab.annotations)-1].end
 
 	return end - start
 }
 
-// Gets the total amount of annotations in a lab file.
-func (lab Lab) GetLength() (result int) {
+// GetLength gets the total amount of annotations in a lab file.
+func (lab *Lab) GetLength() (result int) {
 	return len(lab.annotations)
 }
 
-// Takes a path to a .lab file and reads its contents into a Lab.
+// ReadLab takes a path to a .lab file and reads its contents into a Lab.
 func ReadLab(path string) (Lab, error) {
 	lab := Lab{}
 	parsedPrecision := false
@@ -98,7 +98,12 @@ func ReadLab(path string) (Lab, error) {
 	if err != nil {
 		return lab, err
 	}
-	defer labData.Close()
+	defer func() {
+		closingError := labData.Close()
+		if err == nil {
+			err = closingError
+		}
+	}()
 
 	// iterate through the file and write to lab object
 	line := bufio.NewScanner(labData)
@@ -111,7 +116,7 @@ func ReadLab(path string) (Lab, error) {
 			return lab, fmt.Errorf("error: malformed lab file %s", path)
 		}
 
-		// parse the precision if it hasnt been parsed yet
+		// parse the precision if it hasn't been parsed yet
 		if !parsedPrecision {
 			lab.parsePrecision(labLine[1])
 			parsedPrecision = true
@@ -137,9 +142,9 @@ func ReadLab(path string) (Lab, error) {
 	return lab, err
 }
 
-// Writes a lab to a file from a given path. If the file already exists, it will be overwritten unless overwrite is set to false.
+// WriteLab writes a lab to a file from a given path. If the file already exists, it will be overwritten unless overwrite is set to false.
 // If the path is a directory, the lab will be written to a file with the same name as the lab, in the directory.
-func (lab Lab) WriteLab(path string, overwrite ...bool) {
+func (lab *Lab) WriteLab(path string, overwrite ...bool) error {
 	// if no overwrite is specified, default to false
 	if len(overwrite) == 0 {
 		overwrite = append(overwrite, false)
@@ -151,23 +156,29 @@ func (lab Lab) WriteLab(path string, overwrite ...bool) {
 	// initialize the filename
 	var fileName string
 
-	// check if path exists, if it doesnt, make it.
+	// check if path exists, if it doesn't, make it.
 	pathInfo, err := os.Stat(path)
 	if err != nil {
 		if filepath.Ext(path) != "" {
 			// if the path is a file, make the directory it is in
 			pathSplit := strings.Split(path, "/")
-			os.MkdirAll(strings.Join(pathSplit[0:len(pathSplit)-1], "/"), os.ModePerm)
+			err := os.MkdirAll(strings.Join(pathSplit[0:len(pathSplit)-1], "/"), os.ModePerm)
+			if err != nil {
+				return err
+			}
 		} else {
 			// if the path is a directory, make it
-			os.MkdirAll(path, os.ModePerm)
+			err := os.MkdirAll(path, os.ModePerm)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	// if path is a directory, construct the desired filename. if path is a file, make it.
 	if filepath.Ext(path) == "" || (pathInfo != nil && pathInfo.IsDir()) {
 		// create the filename if the destination is a directory
-		fileName = filepath.Join(path, (lab.name + ".lab"))
+		fileName = filepath.Join(path, lab.name+".lab")
 	} else {
 		// if the path is a file, check if it already exists and if overwrite is false
 		if pathInfo != nil && !overwrite[0] {
@@ -181,7 +192,12 @@ func (lab Lab) WriteLab(path string, overwrite ...bool) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		closingError := file.Close()
+		if err == nil {
+			err = closingError
+		}
+	}(file)
 
 	// iterate through the annotations and write them to the file
 	precision := lab.precision
@@ -190,12 +206,16 @@ func (lab Lab) WriteLab(path string, overwrite ...bool) {
 		start := labEntry.start
 		end := labEntry.end
 
-		fmt.Fprintln(file, strconv.FormatFloat(start, 'f', int(precision), 64), strconv.FormatFloat(end, 'f', int(precision), 64), labEntry.label)
+		_, err := fmt.Fprintln(file, strconv.FormatFloat(start, 'f', int(precision), 64), strconv.FormatFloat(end, 'f', int(precision), 64), labEntry.label)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-// Converts a lab to a string
-func (lab Lab) ToString() string {
+// ToString converts a lab to a string.
+func (lab *Lab) ToString() string {
 	var result string
 
 	for _, annotation := range lab.annotations {
@@ -205,7 +225,7 @@ func (lab Lab) ToString() string {
 	return result
 }
 
-// Parses the precision of a lab file based on the context of the time durations
+// Parses the precision of a lab file based on the context of the time durations.
 func (lab *Lab) parsePrecision(secondTime string) {
 	periodIndex := strings.Index(secondTime, ".")
 

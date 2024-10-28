@@ -20,43 +20,43 @@ type TextGrid struct {
 	name  string
 }
 
-// Returns xmin of TextGrid
-func (tg TextGrid) GetXmin() float64 {
+// GetXmin - Returns xmin of TextGrid
+func (tg *TextGrid) GetXmin() float64 {
 	return tg.xmin
 }
 
-// Sets xmin of TextGrid
+// SetXmin - Sets xmin of TextGrid
 func (tg *TextGrid) SetXmin(xmin float64) {
 	tg.xmin = xmin
 }
 
-// Returns xmax of TextGrid
-func (tg TextGrid) GetXmax() float64 {
+// GetXmax - Returns xmax of TextGrid
+func (tg *TextGrid) GetXmax() float64 {
 	return tg.xmax
 }
 
-// Sets xmax of TextGrid
+// SetXmax - Sets xmax of TextGrid
 func (tg *TextGrid) SetXmax(xmax float64) {
 	tg.xmax = xmax
 }
 
-// Returns name of TextGrid
-func (tg TextGrid) GetName() string {
+// GetName - Returns name of TextGrid
+func (tg *TextGrid) GetName() string {
 	return tg.name
 }
 
-// Sets name of TextGrid
+// SetName - Sets name of TextGrid
 func (tg *TextGrid) SetName(name string) {
 	tg.name = name
 }
 
-// Gets tiers of TextGrid
-func (tg TextGrid) GetTiers() []Tier {
+// GetTiers - Gets tiers of TextGrid
+func (tg *TextGrid) GetTiers() []Tier {
 	return tg.tiers
 }
 
-// Returns true if TextGrid has IntervalTier
-func (tg TextGrid) HasIntervalTier() bool {
+// HasIntervalTier - Returns true if TextGrid has IntervalTier
+func (tg *TextGrid) HasIntervalTier() bool {
 	for _, tier := range tg.tiers {
 		if tier.TierType() == "IntervalTier" {
 			return true
@@ -65,8 +65,8 @@ func (tg TextGrid) HasIntervalTier() bool {
 	return false
 }
 
-// Returns true if TextGrid has PointTier
-func (tg TextGrid) HasPointTier() bool {
+// HasPointTier - Returns true if TextGrid has PointTier
+func (tg *TextGrid) HasPointTier() bool {
 	for _, tier := range tg.tiers {
 		if tier.TierType() == "PointTier" {
 			return true
@@ -75,8 +75,8 @@ func (tg TextGrid) HasPointTier() bool {
 	return false
 }
 
-// Returns tier with given name, if it exists
-func (tg TextGrid) GetTier(name string) Tier {
+// GetTier - Returns tier with given name, if it exists
+func (tg *TextGrid) GetTier(name string) Tier {
 	for _, tier := range tg.tiers {
 		if tier.TierName() == name {
 			return tier
@@ -85,7 +85,7 @@ func (tg TextGrid) GetTier(name string) Tier {
 	return nil
 }
 
-// Takes a path to a .TextGrid file and reads its contents into a TextGrid.
+// ReadTextgrid - Takes a path to a .TextGrid file and reads its contents into a TextGrid.
 func ReadTextgrid(path string) (TextGrid, error) {
 	tg := TextGrid{}
 	tgDeque := deque.New[string]()
@@ -100,7 +100,7 @@ func ReadTextgrid(path string) (TextGrid, error) {
 		return tg, err
 	}
 
-	// if somehow utfutil finds something else, error out
+	// if somehow utf-util finds something else, error out
 	// chardet will sometimes read ASCII as ISO-8859-1, which go will always interpret correctly when casting its byte slice to a string.
 	retrievedEncoding := getEncoding(tgData)
 	if retrievedEncoding != "UTF-8" && retrievedEncoding != "ISO-8859-1" {
@@ -122,7 +122,7 @@ func ReadTextgrid(path string) (TextGrid, error) {
 	globalXmin := pullFloat(tgDeque.PopFront())
 	globalXmax := pullFloat(tgDeque.PopFront())
 
-	// set the xmin and xmax preemptivley incase the status is <absent>
+	// set the xmin and xmax preemptively in case the status is <absent>
 	tg.xmin = globalXmin
 	tg.xmax = globalXmax
 
@@ -148,7 +148,7 @@ func ReadTextgrid(path string) (TextGrid, error) {
 // }
 
 func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[string], numTiers int) []Tier {
-	tiers := []Tier{}
+	var tiers []Tier
 	tierCounter := 0
 
 	for tierCounter < numTiers {
@@ -174,7 +174,7 @@ func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[str
 
 		// loop for each tier type
 		if tierType == "IntervalTier" {
-			intervals := []Interval{}
+			var intervals []Interval
 
 			for contentCounter != tierContentCount {
 				// the next three values in an interval are the xmin, xmax, and text
@@ -194,7 +194,7 @@ func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[str
 			tiers = append(tiers, &newIntervalTier)
 
 		} else if tierType == "TextTier" { // point tier
-			points := []Point{}
+			var points []Point
 
 			for contentCounter != tierContentCount {
 				// the next two values in a point are the value and the mark
@@ -220,28 +220,28 @@ func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[str
 	return tiers
 }
 
-// turns textgrid file content into a slice of useable strings.
+// turns textgrid file content into a slice of usable strings.
 // internally, any textgrid given is converted into a "short" type textgrid with any empty lines removed
 func processContent(data []byte) []string {
 
 	// remove all empty lines
 	tgString := strings.ReplaceAll(string(data), "\n\n", "\n")
 
-	bracketRegex := regexp.MustCompile(`\[\d+\]`)
+	bracketRegex := regexp.MustCompile(`\[\d+]`)
 
 	// a short textgrid is basically a textgrid that is only labels, numbers, and flags.
-	// we will use regex to remove everything that isnt needed by praat to recognize a textgrid.
+	// we will use regex to remove everything that isn't needed by praat to recognize a textgrid.
 	// `\d+(\.\d+)?` matches all floats and integers
-	// `\"[^\"]*\` matches all content inbetween double quotes
-	// `\<[^>]*>` matches all content inbetween angle brackets
-	textgridRegex := regexp.MustCompile(`(\d+(\.\d+)?|\"[^\"]*\"|<[^>]*>)`)
+	// `\"[^\"]*\` matches all content in between double quotes
+	// `\<[^>]*>` matches all content in between angle brackets
+	textgridRegex := regexp.MustCompile(`(\d+(\.\d+)?|"[^"]*"|<[^>]*)`)
 
 	tgSanitized := strings.Join(textgridRegex.FindAllString(bracketRegex.ReplaceAllString(tgString, ""), -1), "\n")
 
 	return strings.Split(tgSanitized, "\n")
 }
 
-// checks the nessecary `File Type` and `Object Class` fields of a TextGrid file
+// checks the necessary `File Type` and `Object Class` fields of a TextGrid file
 func verifyHead(tgContent *deque.Deque[string]) bool {
 	fileType := tgContent.PopFront()
 	objectClass := tgContent.PopFront()
@@ -267,7 +267,7 @@ func pullQuotedValue(str string) string {
 }
 
 // takes a value that has angle brackets and removes them.
-// this is only used for flags in textgrids, so we don't care about internal brackets.
+// this is only used for flags in TextGrids, so we don't care about internal brackets.
 func pullBracketedValue(str string) string {
 	stringRegex := regexp.MustCompile(`[<>]`)
 	return stringRegex.ReplaceAllString(str, "")

@@ -3,8 +3,6 @@ package htk
 import "testing"
 
 func TestGettingAnnotationDuration(t *testing.T) {
-	t.Log("test getting annotation duration...")
-
 	// loading the first annotation from the first example as a dummy annotation
 	lab, err := ReadLab("examples/01.lab")
 	if err != nil {
@@ -18,12 +16,10 @@ func TestGettingAnnotationDuration(t *testing.T) {
 		t.Fatalf("wanted duration %f, received %f", trueDuration, annotation.GetDuration())
 	}
 
-	t.Log("getting annotation duration successful!")
+	t.Log("Getting annotation duration successful!")
 }
 
 func TestGettingAnnotationStart(t *testing.T) {
-	t.Log("test getting annotation start...")
-
 	lab, err := ReadLab("examples/01.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -40,8 +36,6 @@ func TestGettingAnnotationStart(t *testing.T) {
 }
 
 func TestGettingAnnotationEnd(t *testing.T) {
-	t.Log("test getting annotation end...")
-
 	lab, err := ReadLab("examples/01.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -58,8 +52,6 @@ func TestGettingAnnotationEnd(t *testing.T) {
 }
 
 func TestGettingAnnotationLabel(t *testing.T) {
-	t.Log("test getting annotation label...")
-
 	lab, err := ReadLab("examples/01.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -76,8 +68,6 @@ func TestGettingAnnotationLabel(t *testing.T) {
 }
 
 func TestSettingAnnotationStartEnd(t *testing.T) {
-	t.Log("test setting annotation start and end...")
-
 	lab, err := ReadLab("examples/01.lab")
 	if err != nil {
 		t.Fatal(err)
@@ -97,8 +87,6 @@ func TestSettingAnnotationStartEnd(t *testing.T) {
 }
 
 func TestSettingAnnotationLabel(t *testing.T) {
-	t.Log("test setting annotaiton label...")
-
 	lab, err := ReadLab("examples/01.lab")
 	if err != nil {
 		t.Fatal(err)

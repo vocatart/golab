@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-// A tier is an arbitrary type that can hold either intervals or points.
+// Tier - A tier is an arbitrary type that can hold either intervals or points.
 type Tier interface {
 	TierType() string
 	TierName() string
@@ -28,7 +28,7 @@ type Tier interface {
 	sort()
 }
 
-// An interval tier holds a collection of intervals, along with a tier name and total duration.
+// IntervalTier - An interval tier holds a collection of intervals, along with a tier name and total duration.
 type IntervalTier struct {
 	name      string
 	xmin      float64
@@ -36,7 +36,7 @@ type IntervalTier struct {
 	intervals []Interval
 }
 
-// A point tier holds a collection of points, along with a tier name and total duration.
+// PointTier - A point tier holds a collection of points, along with a tier name and total duration.
 type PointTier struct {
 	name   string
 	xmin   float64
@@ -46,67 +46,67 @@ type PointTier struct {
 
 // TODO: make these safer
 
-// Returns tier type for `IntervalTier`
-func (iTier IntervalTier) TierType() string {
+// TierType - Returns tier type for IntervalTier
+func (iTier *IntervalTier) TierType() string {
 	return "IntervalTier"
 }
 
-// Returns tier type for `PointTier`
-func (pTier PointTier) TierType() string {
+// TierType - Returns tier type for PointTier
+func (pTier *PointTier) TierType() string {
 	return "PointTier"
 }
 
-// Returns tier duration for `IntervalTier`
-func (iTier IntervalTier) TierDuration() float64 {
+// TierDuration - Returns tier duration for IntervalTier
+func (iTier *IntervalTier) TierDuration() float64 {
 	return iTier.xmax - iTier.xmin
 }
 
-// Returns tier duration for `PointTier`
-func (pTier PointTier) TierDuration() float64 {
+// TierDuration - Returns tier duration for PointTier
+func (pTier *PointTier) TierDuration() float64 {
 	return pTier.xmax - pTier.xmin
 }
 
-// Returns tier name for `IntervalTier`
-func (iTier IntervalTier) TierName() string {
+// TierName - Returns tier name for IntervalTier
+func (iTier *IntervalTier) TierName() string {
 	return iTier.name
 }
 
-// Returns tier name for `PointTier`
-func (pTier PointTier) TierName() string {
+// TierName - Returns tier name for PointTier
+func (pTier *PointTier) TierName() string {
 	return pTier.name
 }
 
-// Returns xmin for `IntervalTier`
-func (iTier IntervalTier) TierXmin() float64 {
+// TierXmin - Returns xmin for IntervalTier
+func (iTier *IntervalTier) TierXmin() float64 {
 	return iTier.xmin
 }
 
-// Returns xmin for `PointTier`
-func (pTier PointTier) TierXmin() float64 {
+// TierXmin - Returns xmin for PointTier
+func (pTier *PointTier) TierXmin() float64 {
 	return pTier.xmin
 }
 
-// Returns xmax for `IntervalTier`
-func (iTier IntervalTier) TierXmax() float64 {
+// TierXmax - Returns xmax for IntervalTier
+func (iTier *IntervalTier) TierXmax() float64 {
 	return iTier.xmax
 }
 
-// Returns the xmax for `PointTier`
-func (pTier PointTier) TierXmax() float64 {
+// TierXmax - Returns the xmax for PointTier
+func (pTier *PointTier) TierXmax() float64 {
 	return pTier.xmax
 }
 
-// Sets name for tier `IntervalTier`
+// SetName - Sets name for tier IntervalTier
 func (iTier *IntervalTier) SetName(name string) {
 	iTier.name = name
 }
 
-// Sets name for tier `PointTier`
+// SetName - Sets name for tier PointTier
 func (pTier *PointTier) SetName(name string) {
 	pTier.name = name
 }
 
-// Sets xmin for tier `IntervalTier`
+// SetXmin - Sets xmin for tier IntervalTier
 func (iTier *IntervalTier) SetXmin(xmin float64, warn ...bool) error {
 
 	// default value of warn is true
@@ -115,7 +115,7 @@ func (iTier *IntervalTier) SetXmin(xmin float64, warn ...bool) error {
 	}
 
 	// if there is a value in the tier that is smaller than the xmin that is being set, return an error.
-	foundXmins := []float64{}
+	var foundXmins []float64
 	for _, interval := range iTier.intervals {
 		foundXmins = append(foundXmins, interval.xmin)
 	}
@@ -131,14 +131,14 @@ func (iTier *IntervalTier) SetXmin(xmin float64, warn ...bool) error {
 	return nil
 }
 
-// Sets xmin for tier `PointTier`
+// SetXmin - Sets xmin for tier PointTier
 func (pTier *PointTier) SetXmin(xmin float64, warn ...bool) error {
 
 	if len(warn) == 0 {
 		warn = append(warn, true)
 	}
 
-	foundValues := []float64{}
+	var foundValues []float64
 	for _, point := range pTier.points {
 		foundValues = append(foundValues, point.value)
 	}
@@ -154,14 +154,14 @@ func (pTier *PointTier) SetXmin(xmin float64, warn ...bool) error {
 	return nil
 }
 
-// Sets xmax for tier `IntervalTier`
+// SetXmax - Sets xmax for tier IntervalTier
 func (iTier *IntervalTier) SetXmax(xmax float64, warn ...bool) error {
 
 	if len(warn) == 0 {
 		warn = append(warn, true)
 	}
 
-	foundXmaxs := []float64{}
+	var foundXmaxs []float64
 	for _, interval := range iTier.intervals {
 		foundXmaxs = append(foundXmaxs, interval.xmax)
 	}
@@ -177,14 +177,14 @@ func (iTier *IntervalTier) SetXmax(xmax float64, warn ...bool) error {
 	return nil
 }
 
-// Sets xmax for tier `PointTier`
+// SetXmax - Sets xmax for tier PointTier
 func (pTier *PointTier) SetXmax(xmax float64, warn ...bool) error {
 
 	if len(warn) == 0 {
 		warn = append(warn, true)
 	}
 
-	foundValues := []float64{}
+	var foundValues []float64
 	for _, point := range pTier.points {
 		foundValues = append(foundValues, point.value)
 	}
@@ -199,18 +199,18 @@ func (pTier *PointTier) SetXmax(xmax float64, warn ...bool) error {
 	return nil
 }
 
-// Returns the size (number of intervals) of `IntervalTier`
-func (iTier IntervalTier) GetSize() int {
+// GetSize - Returns the size (number of intervals) of IntervalTier
+func (iTier *IntervalTier) GetSize() int {
 	return len(iTier.intervals)
 }
 
-// Returns the size (number of points) of `PointTier`
-func (pTier PointTier) GetSize() int {
+// GetSize - Returns the size (number of points) of PointTier
+func (pTier *PointTier) GetSize() int {
 	return len(pTier.points)
 }
 
-// Returns slice of intervals from an `IntervalTier“
-func (iTier IntervalTier) GetIntervals() []Interval {
+// GetIntervals - Returns slice of intervals from an IntervalTier
+func (iTier *IntervalTier) GetIntervals() []Interval {
 	return iTier.intervals
 }
 
@@ -229,8 +229,8 @@ func (iTier *IntervalTier) PushPoints([]Point, ...bool) error {
 	panic("not point tier")
 }
 
-// Returns slice of points from a `PointTier`
-func (pTier PointTier) GetPoints() []Point {
+// GetPoints - Returns slice of points from a PointTier
+func (pTier *PointTier) GetPoints() []Point {
 	return pTier.points
 }
 
@@ -249,7 +249,7 @@ func (pTier *PointTier) PushIntervals([]Interval, ...bool) error {
 	panic("not interval tier")
 }
 
-// Pushes an interval to the interval tier. Sorts intervals by minimum x value after pushing the interval.
+// PushInterval - Pushes an interval to the interval tier. Sorts intervals by minimum x value after pushing the interval.
 func (iTier *IntervalTier) PushInterval(intervalPush Interval, warn ...bool) error {
 
 	if len(warn) == 0 {
@@ -266,7 +266,7 @@ func (iTier *IntervalTier) PushInterval(intervalPush Interval, warn ...bool) err
 	return nil
 }
 
-// Pushes a slice of intervals to the interval tier. Sorts intervals by minimum x value after pushing the intervals.
+// PushIntervals - Pushes a slice of intervals to the interval tier. Sorts intervals by minimum x value after pushing the intervals.
 func (iTier *IntervalTier) PushIntervals(intervalsPush []Interval, warn ...bool) error {
 
 	if len(warn) == 0 {
@@ -287,7 +287,7 @@ func (iTier *IntervalTier) PushIntervals(intervalsPush []Interval, warn ...bool)
 	return nil
 }
 
-// Sets all intervals of an interval tier. Checks for xmin and xmax mismatch, and sorts the modified interval tier.
+// SetIntervals - Sets all intervals of an interval tier. Checks for xmin and xmax mismatch, and sorts the modified interval tier.
 func (iTier *IntervalTier) SetIntervals(newIntervals []Interval, warn ...bool) error {
 
 	if len(warn) == 0 {
@@ -320,10 +320,10 @@ func (pTier *PointTier) GetOverlapping() [][]int {
 	panic("not interval tier")
 }
 
-// Checks for overlaps in an interval tier. Returns a 2d slide of overlapping interval indicies, or nil.
-func (iTier IntervalTier) GetOverlapping() [][]int {
+// GetOverlapping - Checks for overlaps in an interval tier. Returns a 2d slide of overlapping interval indices, or nil.
+func (iTier *IntervalTier) GetOverlapping() [][]int {
 
-	overlaps := [][]int{}
+	var overlaps [][]int
 
 	// iterate over each pair of intervals, comparing the xmax to the next xmin (which should be the same)
 	for i, interval := range iTier.intervals {
@@ -341,6 +341,7 @@ func (iTier IntervalTier) GetOverlapping() [][]int {
 	}
 }
 
+// PushPoint - adds a given point to the PointTier, optionally warning if the point's value is less than the tier's xmin value.
 func (pTier *PointTier) PushPoint(pointPush Point, warn ...bool) error {
 
 	if len(warn) == 0 {
@@ -357,6 +358,7 @@ func (pTier *PointTier) PushPoint(pointPush Point, warn ...bool) error {
 	return nil
 }
 
+// PushPoints - adds a slice of points to the PointTier, with an optional warning if any point's value is less than the tier's xmin value.
 func (pTier *PointTier) PushPoints(pointsPush []Point, warn ...bool) error {
 
 	if len(warn) == 0 {
