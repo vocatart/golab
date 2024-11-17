@@ -1,6 +1,6 @@
 package textgrid
 
-// Point - A point is a specifc time marker with a string value.
+// Point - A point is a specific time marker with a string value.
 type Point struct {
 	value float64
 	mark  string

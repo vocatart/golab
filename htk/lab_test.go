@@ -57,7 +57,7 @@ func TestWritingDifferentPrecision(t *testing.T) {
 		return
 	}
 
-	t.Log("different pricision writing successful!")
+	t.Log("different precision writing successful!")
 }
 
 func TestPrintingLabString(t *testing.T) {
