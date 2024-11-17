@@ -3,6 +3,7 @@ package textgrid
 import (
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -85,6 +86,11 @@ func (tg *TextGrid) GetTier(name string) Tier {
 	return nil
 }
 
+// GetSize returns the amount of Tier entries in a TextGrid.
+func (tg *TextGrid) GetSize() int {
+	return len(tg.tiers)
+}
+
 // ReadTextgrid - Takes a path to a .TextGrid file and reads its contents into a TextGrid.
 func ReadTextgrid(path string) (TextGrid, error) {
 	var tg = TextGrid{}
@@ -114,13 +120,16 @@ func ReadTextgrid(path string) (TextGrid, error) {
 	}
 
 	// verify the first two entries in the deque
-	if !verifyHead(tgDeque) {
-		return tg, fmt.Errorf("error: textgrid %s has malformed header", tg.name)
+	err = verifyHead(tgDeque)
+	if err != nil {
+		return tg, fmt.Errorf("error: textgrid %s has malformed header\n %s", tg.name, err.Error())
 	}
 
 	// pop the next two values, which should be xmin and xmax respectively.
 	globalXmin := pullFloat(tgDeque.PopFront())
 	globalXmax := pullFloat(tgDeque.PopFront())
+
+	fmt.Println(globalXmax)
 
 	// set the xmin and xmax preemptively in case the status is <absent>
 	tg.xmin = globalXmin
@@ -147,9 +156,169 @@ func ReadTextgrid(path string) (TextGrid, error) {
 	return tg, nil
 }
 
-// TODO: Implement
-// func (tg TextGrid) WriteLong(path string, overwrite ...bool) {
-// }
+// WriteLong writes to a .TextGrid file in long format.
+// Will overwrite existing files unless otherwise specified.
+func (tg *TextGrid) WriteLong(path string, overwrite ...bool) error {
+	// default to false
+	if len(overwrite) == 0 {
+		overwrite = append(overwrite, false)
+	}
+
+	// replace backslashes with forward slashes
+	path = strings.Replace(path, "\\", "/", -1)
+
+	var fileName string
+	pathInfo, err := os.Stat(path)
+	if err != nil {
+		if filepath.Ext(path) != "" {
+			// if the path is a file, make the directory it is in
+			pathSplit := strings.Split(path, "/")
+			err := os.MkdirAll(strings.Join(pathSplit[0:len(pathSplit)-1], "/"), os.ModePerm)
+			if err != nil {
+				return err
+			}
+		} else {
+			// if the path is a directory, make it
+			err := os.MkdirAll(path, os.ModePerm)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// if path is a directory, construct the desired filename. If path is a file, make it.
+	if filepath.Ext(path) == "" || (pathInfo != nil && pathInfo.IsDir()) {
+		fileName = filepath.Join(path, tg.name+".TextGrid")
+	} else {
+		// if the path is a file, check if it already exists and if overwrite is false
+		if pathInfo != nil && !overwrite[0] {
+			return fmt.Errorf("error writing textgrid %q: file %s already exists", tg.name, path)
+		}
+		fileName = path
+	}
+
+	// create the file with the filename defined above
+	file, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	defer func(file *os.File) {
+		closingError := file.Close()
+		if err == nil {
+			err = closingError
+		}
+	}(file)
+
+	// create the header of the textgrid file
+	_, err = fmt.Fprintf(file, "File type = \"ooTextFile\"\nObject class = \"TextGrid\"\n\n")
+	if err != nil {
+		return err
+	}
+
+	// create the xmin and xmax of the textgrid file
+	_, err = fmt.Fprintf(file, "xmin = %s\nxmax = %s\n", f2s(tg.xmin), f2s(tg.xmax))
+	if err != nil {
+		return err
+	}
+
+	// create the tier flag
+	// is usually <exists> if you have tiers, but can also be <absent> if you somehow have a tier-less textgrid
+	if tg.tiers == nil {
+		_, err = fmt.Fprintf(file, "tiers? <absent>")
+		return nil
+	} else {
+		_, err = fmt.Fprintf(file, "tiers? <exists>")
+	}
+
+	// create the size field, which is the number of tiers in the textgrid.
+	_, err = fmt.Fprintf(file, "\nsize = %d\n", tg.GetSize())
+	if err != nil {
+		return err
+	}
+
+	// begin writing tiers, which starts with the blank item [] field
+	_, err = fmt.Fprintf(file, "item []:\n")
+	if err != nil {
+		return err
+	}
+
+	for tierNum, tier := range tg.tiers {
+		// write tier info
+		_, err = fmt.Fprintf(file, "\titem [%d]:\n", tierNum+1)
+		if err != nil {
+			return err
+		}
+
+		// tier class
+		_, err = fmt.Fprintf(file, "\t\tclass = \"%s\"\n", tier.TierType())
+		if err != nil {
+			return err
+		}
+
+		// tier name
+		_, err = fmt.Fprintf(file, "\t\tname = \"%s\"\n", tier.TierName())
+		if err != nil {
+			return err
+		}
+
+		// xmin and xmax
+		_, err = fmt.Fprintf(file, "\t\txmin = %s\n\t\txmax = %s\n", f2s(tier.TierXmin()), f2s(tier.TierXmax()))
+
+		// write content info and contents of tier
+		if tier.TierType() == "IntervalTier" {
+			// if tier is interval tier
+			_, err = fmt.Fprintf(file, "\t\tintervals: size = %d\n", tier.GetSize())
+			if err != nil {
+				return err
+			}
+
+			for intervalNum, interval := range tier.GetIntervals() {
+				// write interval number
+				_, err = fmt.Fprintf(file, "\t\tintervals [%d]:\n", intervalNum)
+				if err != nil {
+					return err
+				}
+
+				// xmin and xmax
+				_, err = fmt.Fprintf(file, "\t\t\txmin = %f\n\t\t\txmax = %f\n", tg.xmin, tg.xmax)
+				if err != nil {
+					return err
+				}
+
+				// text
+				_, err = fmt.Fprintf(file, "\t\t\ttext = \"%s\"\n", interval.text)
+				if err != nil {
+					return err
+				}
+			}
+		} else {
+			// if tier is point tier
+			_, err = fmt.Fprintf(file, "\t\tpoints: size = %d\n", tier.GetSize())
+			if err != nil {
+				return err
+			}
+
+			for pointNum, point := range tier.GetPoints() {
+				// write point number
+				_, err = fmt.Fprintf(file, "\t\tpoints [%d]:\n", pointNum)
+				if err != nil {
+					return err
+				}
+
+				// value
+				_, err = fmt.Fprintf(file, "\t\t\tnumber = %f\n", point.value)
+				if err != nil {
+					return err
+				}
+
+				// mark
+				_, err = fmt.Fprintf(file, "\t\t\tmark = \"%s\"\n", point.mark)
+			}
+		}
+	}
+
+	return nil
+}
 
 func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[string], numTiers int) ([]Tier, error) {
 	var tiers []Tier
@@ -246,21 +415,19 @@ func processContent(data []byte) []string {
 }
 
 // checks the necessary `File Type` and `Object Class` fields of a TextGrid file
-func verifyHead(tgContent *deque.Deque[string]) bool {
+func verifyHead(tgContent *deque.Deque[string]) error {
 	fileType := tgContent.PopFront()
 	objectClass := tgContent.PopFront()
 
 	if pullQuotedValue(fileType) != "ooTextFile" {
-		log.Printf("error: wanted fileType ooTextFile, recieved %s", fileType)
-		return false
+		return fmt.Errorf("error: wanted fileType ooTextFile, recieved %s", fileType)
 	}
 
 	if pullQuotedValue(objectClass) != "TextGrid" {
-		log.Printf("error: wanted objectClass TextGrid, recieved %s", objectClass)
-		return false
+		return fmt.Errorf("error: wanted objectClass TextGrid, recieved %s", objectClass)
 	}
 
-	return true
+	return nil
 }
 
 // takes a value contained in quotes and returns it without quotes.
@@ -297,6 +464,7 @@ func pullFloat(str string) float64 {
 	return result
 }
 
+// get encoding type of binary data slice
 func getEncoding(data []byte) string {
 	detector := chardet.NewTextDetector()
 
@@ -306,4 +474,9 @@ func getEncoding(data []byte) string {
 	}
 
 	return detectedEncoding.Charset
+}
+
+// convert float to string
+func f2s(f float64) string {
+	return strconv.FormatFloat(f, 'f', -1, 64)
 }

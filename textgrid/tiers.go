@@ -53,7 +53,7 @@ func (iTier *IntervalTier) TierType() string {
 
 // TierType - Returns tier type for PointTier
 func (pTier *PointTier) TierType() string {
-	return "PointTier"
+	return "TextTier"
 }
 
 // TierDuration - Returns tier duration for IntervalTier
