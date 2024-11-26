@@ -29,6 +29,7 @@ func TestReadingTextgridUTF8(t *testing.T) {
 		t.Error(err)
 	}
 }
+
 func TestWritingLongTextgrid(t *testing.T) {
 	tg, err := ReadTextgrid("examples/long.TextGrid")
 	if err != nil {
@@ -36,6 +37,18 @@ func TestWritingLongTextgrid(t *testing.T) {
 	}
 
 	err = tg.WriteLong("examples/long_output.TextGrid", true)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestWritingShortTextgrid(t *testing.T) {
+	tg, err := ReadTextgrid("examples/short.TextGrid")
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = tg.WriteShort("examples/short_output.TextGrid", true)
 	if err != nil {
 		t.Error(err)
 	}

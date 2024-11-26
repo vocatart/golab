@@ -19,7 +19,7 @@ item []:
         intervals [2]:
             xmin = 0.7427342752056899 
             xmax = 1.7447703580322245 
-            text = "1_label2" 
+            text = "1_label2"
         intervals [3]:
             xmin = 1.7447703580322245 
             xmax = 2.3510204081632655 

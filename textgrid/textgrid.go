@@ -108,7 +108,12 @@ func ReadTextgrid(path string) (TextGrid, error) {
 
 	// if somehow utf-util finds something else, error out
 	// chardet will sometimes read ASCII as ISO-8859-1, which go will always interpret correctly when casting its byte slice to a string.
-	retrievedEncoding := getEncoding(tgData)
+	retrievedEncoding, err := getEncoding(tgData)
+	if err != nil {
+		return tg, fmt.Errorf("error: error parsing file encoding for %s:\n %s", tg.name, err.Error())
+	}
+
+	// check encoding
 	if retrievedEncoding != "UTF-8" && retrievedEncoding != "ISO-8859-1" {
 		return tg, fmt.Errorf("error: encoding out of scope, recieved %q encoding for %q", retrievedEncoding, tg.name)
 	}
@@ -126,8 +131,15 @@ func ReadTextgrid(path string) (TextGrid, error) {
 	}
 
 	// pop the next two values, which should be xmin and xmax respectively.
-	globalXmin := pullFloat(tgDeque.PopFront())
-	globalXmax := pullFloat(tgDeque.PopFront())
+	globalXmin, err := pullFloat(tgDeque.PopFront())
+	if err != nil {
+		return tg, fmt.Errorf("error: cannot parse textgrid xmin in %s:\n %s", tg.name, err.Error())
+	}
+
+	globalXmax, err := pullFloat(tgDeque.PopFront())
+	if err != nil {
+		return tg, fmt.Errorf("error: cannot parse textgrid xmax in %s:\n %s", tg.name, err.Error())
+	}
 
 	fmt.Println(globalXmax)
 
@@ -145,11 +157,14 @@ func ReadTextgrid(path string) (TextGrid, error) {
 	}
 
 	// get the number of tiers that exist in this textgrid
-	numTiers := pullInt(tgDeque.PopFront())
+	numTiers, err := pullInt(tgDeque.PopFront())
+	if err != nil {
+		return tg, fmt.Errorf("error: cannot parse textgrid numTiers:\n %s", err.Error())
+	}
 
 	tiers, err := parseTiers(globalXmin, globalXmax, tgDeque, numTiers)
 	if err != nil {
-		return tg, err
+		return tg, fmt.Errorf("error: cannot parse textgrid tiers:\n %s", err.Error())
 	}
 	tg.tiers = tiers
 
@@ -250,13 +265,13 @@ func (tg *TextGrid) WriteLong(path string, overwrite ...bool) error {
 		}
 
 		// tier class
-		_, err = fmt.Fprintf(file, "\t\tclass = \"%s\"\n", tier.TierType())
+		_, err = fmt.Fprintf(file, "\t\tclass = %q\n", tier.TierType())
 		if err != nil {
 			return err
 		}
 
 		// tier name
-		_, err = fmt.Fprintf(file, "\t\tname = \"%s\"\n", tier.TierName())
+		_, err = fmt.Fprintf(file, "\t\tname = %q\n", tier.TierName())
 		if err != nil {
 			return err
 		}
@@ -286,7 +301,7 @@ func (tg *TextGrid) WriteLong(path string, overwrite ...bool) error {
 				}
 
 				// text
-				_, err = fmt.Fprintf(file, "\t\t\ttext = \"%s\"\n", interval.text)
+				_, err = fmt.Fprintf(file, "\t\t\ttext = %q\n", interval.text)
 				if err != nil {
 					return err
 				}
@@ -312,7 +327,7 @@ func (tg *TextGrid) WriteLong(path string, overwrite ...bool) error {
 				}
 
 				// mark
-				_, err = fmt.Fprintf(file, "\t\t\tmark = \"%s\"\n", point.mark)
+				_, err = fmt.Fprintf(file, "\t\t\tmark = %q\n", point.mark)
 			}
 		}
 	}
@@ -320,6 +335,147 @@ func (tg *TextGrid) WriteLong(path string, overwrite ...bool) error {
 	return nil
 }
 
+// WriteShort writes to a .TextGrid file in short format.
+// Will overwrite existing files unless otherwise specified.
+func (tg *TextGrid) WriteShort(path string, overwrite ...bool) error {
+	// default to false
+	if len(overwrite) == 0 {
+		overwrite = append(overwrite, false)
+	}
+
+	// replace backslashes with forward slashes
+	path = strings.Replace(path, "\\", "/", -1)
+
+	var fileName string
+	pathInfo, err := os.Stat(path)
+	if err != nil {
+		if filepath.Ext(path) != "" {
+			// if the path is a file, make the directory it is in
+			pathSplit := strings.Split(path, "/")
+			err := os.MkdirAll(strings.Join(pathSplit[0:len(pathSplit)-1], "/"), os.ModePerm)
+			if err != nil {
+				return err
+			}
+		} else {
+			// if the path is a directory, make it
+			err := os.MkdirAll(path, os.ModePerm)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// if path is a directory, construct the desired filename. If path is a file, make it.
+	if filepath.Ext(path) == "" || (pathInfo != nil && pathInfo.IsDir()) {
+		fileName = filepath.Join(path, tg.name+".TextGrid")
+	} else {
+		// if the path is a file, check if it already exists and if overwrite is false
+		if pathInfo != nil && !overwrite[0] {
+			return fmt.Errorf("error writing textgrid %q: file %s already exists", tg.name, path)
+		}
+		fileName = path
+	}
+
+	// create the file with the filename defined above
+	file, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	defer func(file *os.File) {
+		closingError := file.Close()
+		if err == nil {
+			err = closingError
+		}
+	}(file)
+
+	// create the header of the textgrid file
+	_, err = fmt.Fprintf(file, "File type = \"ooTextFile\"\nObject class = \"TextGrid\"\n\n")
+	if err != nil {
+		return err
+	}
+
+	// create the xmin and xmax of the textgrid file
+	_, err = fmt.Fprintf(file, "%s\n%s\n", f2s(tg.xmin), f2s(tg.xmax))
+	if err != nil {
+		return err
+	}
+
+	// create the tier flag
+	// is usually <exists> if you have tiers, but can also be <absent> if you somehow have a tier-less textgrid
+	if tg.tiers == nil {
+		_, err = fmt.Fprintf(file, "<absent>")
+		return nil
+	} else {
+		_, err = fmt.Fprintf(file, "<exists>")
+	}
+
+	// create the size field, which is the number of tiers in the textgrid.
+	_, err = fmt.Fprintf(file, "\n%d\n", tg.GetSize())
+	if err != nil {
+		return err
+	}
+
+	for _, tier := range tg.tiers {
+		// tier class
+		_, err = fmt.Fprintf(file, "%q\n", tier.TierType())
+		if err != nil {
+			return err
+		}
+
+		// tier name
+		_, err = fmt.Fprintf(file, "%q\n", tier.TierName())
+		if err != nil {
+			return err
+		}
+
+		// xmin and xmax
+		_, err = fmt.Fprintf(file, "%s\n%s\n", f2s(tier.TierXmin()), f2s(tier.TierXmax()))
+
+		// write content info and contents of tier
+		if tier.TierType() == "IntervalTier" {
+			// if tier is interval tier
+			_, err = fmt.Fprintf(file, "%d\n", tier.GetSize())
+			if err != nil {
+				return err
+			}
+
+			for _, interval := range tier.GetIntervals() {
+				// xmin and xmax
+				_, err = fmt.Fprintf(file, "%s\n%s\n", f2s(interval.xmin), f2s(interval.xmax))
+				if err != nil {
+					return err
+				}
+
+				// text
+				_, err = fmt.Fprintf(file, "%q\n", interval.text)
+				if err != nil {
+					return err
+				}
+			}
+		} else {
+			// if tier is point tier
+			_, err = fmt.Fprintf(file, "%d\n", tier.GetSize())
+			if err != nil {
+				return err
+			}
+
+			for _, point := range tier.GetPoints() {
+				// value
+				_, err = fmt.Fprintf(file, "%s\n", f2s(point.value))
+				if err != nil {
+					return err
+				}
+
+				// mark
+				_, err = fmt.Fprintf(file, "%q\n", point.mark)
+			}
+		}
+	}
+
+	return nil
+}
+
+// parse headless deque into tg tiers
 func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[string], numTiers int) ([]Tier, error) {
 	var tiers []Tier
 	tierCounter := 0
@@ -330,8 +486,15 @@ func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[str
 		tierName := pullQuotedValue(content.PopFront())
 
 		// the next two values should be the xmin and xmax of the unique tier
-		tierXmin := pullFloat(content.PopFront())
-		tierXmax := pullFloat(content.PopFront())
+		tierXmin, err := pullFloat(content.PopFront())
+		if err != nil {
+			return nil, fmt.Errorf("error: cannot parse tier %d xmin: %v", tierCounter+1, err)
+		}
+
+		tierXmax, err := pullFloat(content.PopFront())
+		if err != nil {
+			return nil, fmt.Errorf("error: cannot parse tier %d xmax: %v", tierCounter+1, err)
+		}
 
 		// check to see if any boundaries are inconsistent
 		if tierXmin < globalXmin {
@@ -342,7 +505,11 @@ func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[str
 		}
 
 		// the last value before the intervals/points begin should be the number of intervals/points in the unique tier
-		tierContentCount := pullInt(content.PopFront())
+		tierContentCount, err := pullInt(content.PopFront())
+		if err != nil {
+			return nil, err
+		}
+
 		contentCounter := 0
 
 		// loop for each tier type
@@ -351,8 +518,16 @@ func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[str
 
 			for contentCounter != tierContentCount {
 				// the next three values in an interval are the xmin, xmax, and text
-				intervalXmin := pullFloat(content.PopFront())
-				intervalXmax := pullFloat(content.PopFront())
+				intervalXmin, err := pullFloat(content.PopFront())
+				if err != nil {
+					return nil, fmt.Errorf("error: cannot parse xmin in tier %d, interval %d; %v", tierCounter+1, contentCounter+1, err)
+				}
+
+				intervalXmax, err := pullFloat(content.PopFront())
+				if err != nil {
+					return nil, fmt.Errorf("error: cannot parse xmax in tier %d, interval %d; %v", tierCounter+1, contentCounter+1, err)
+				}
+
 				intervalText := pullQuotedValue(content.PopFront())
 
 				// create the new interval
@@ -371,7 +546,11 @@ func parseTiers(globalXmin float64, globalXmax float64, content *deque.Deque[str
 
 			for contentCounter != tierContentCount {
 				// the next two values in a point are the value and the mark
-				pointValue := pullFloat(content.PopFront())
+				pointValue, err := pullFloat(content.PopFront())
+				if err != nil {
+					return nil, fmt.Errorf("error: cannot parse value in tier %d, point %d; %v", tierCounter+1, contentCounter+1, err)
+				}
+
 				pointMark := pullQuotedValue(content.PopFront())
 
 				// create the new point
@@ -445,35 +624,35 @@ func pullBracketedValue(str string) string {
 }
 
 // string into int
-func pullInt(str string) int {
+func pullInt(str string) (int, error) {
 	result, err := strconv.Atoi(str)
 	if err != nil {
-		log.Fatal(err)
+		return result, err
 	}
 
-	return result
+	return result, nil
 }
 
 // string into float
-func pullFloat(str string) float64 {
+func pullFloat(str string) (float64, error) {
 	result, err := strconv.ParseFloat(str, 64)
 	if err != nil {
-		log.Fatal(err)
+		return result, err
 	}
 
-	return result
+	return result, nil
 }
 
 // get encoding type of binary data slice
-func getEncoding(data []byte) string {
+func getEncoding(data []byte) (string, error) {
 	detector := chardet.NewTextDetector()
 
 	detectedEncoding, err := detector.DetectBest(data)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
-	return detectedEncoding.Charset
+	return detectedEncoding.Charset, nil
 }
 
 // convert float to string
