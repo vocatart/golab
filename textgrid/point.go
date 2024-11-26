@@ -1,27 +1,27 @@
 package textgrid
 
-// Point - A point is a specific time marker with a string value.
+// Point structs are annotations that represent a specific point in time, with a text label.
 type Point struct {
 	value float64
 	mark  string
 }
 
-// GetValue - Returns the time value of the point.
+// GetValue returns value of a Point.
 func (point *Point) GetValue() float64 {
 	return point.value
 }
 
-// GetMark - Returns the label mark of the point.
+// GetMark returns the text label of a Point.
 func (point *Point) GetMark() string {
 	return point.mark
 }
 
-// SetValue - Sets the value of the point.
+// SetValue sets the value of a Point.
 func (point *Point) SetValue(value float64) {
 	point.value = value
 }
 
-// SetMark - Sets the label mark of the point.
+// SetMark sets the mark of a Point.
 func (point *Point) SetMark(mark string) {
 	point.mark = mark
 }

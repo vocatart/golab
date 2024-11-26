@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// Lab objects contain a collection of annotations.
+// Lab structs are a collection of annotations.
 // The HTK Label format is defined at http://www.seas.ucla.edu/spapl/weichu/htkbook/node113_mn.html
 type Lab struct {
 	annotations []Annotation
@@ -18,33 +18,33 @@ type Lab struct {
 	precision   uint8
 }
 
-// SetAnnotations sets the annotations of a lab object.
+// SetAnnotations sets the annotations field in a Lab.
 func (lab *Lab) SetAnnotations(annotations []Annotation) {
 	lab.annotations = annotations
 }
 
-// GetAnnotations gets the annotations of a lab object.
+// GetAnnotations gets the annotations field in a Lab.
 func (lab *Lab) GetAnnotations() []Annotation {
 	return lab.annotations
 }
 
-// PushAnnotation pushes an annotation to the end of a lab object.
+// PushAnnotation pushes a single Annotation into the annotations field of a Lab.
 func (lab *Lab) PushAnnotation(annotation Annotation) {
 	lab.annotations = append(lab.annotations, annotation)
 }
 
-// AppendAnnotations appends an annotations object to the end of a lab object.
+// AppendAnnotations appends an Annotation slice to the annotations field in a Lab.
 func (lab *Lab) AppendAnnotations(annotations []Annotation) {
 	lab.annotations = append(lab.annotations, annotations...)
 }
 
-// ClearAnnotations removes all annotations from a lab object.
+// ClearAnnotations removes all annotations in a Lab.
 func (lab *Lab) ClearAnnotations() {
-	lab.annotations = []Annotation{}
+	lab.annotations = nil
 }
 
-// DumpLabels gets all labels in a lab object to a slice.
-func (lab *Lab) DumpLabels() []string {
+// GetLabels returns the annotations field in a Lab as a slice of strings.
+func (lab *Lab) GetLabels() []string {
 	var result []string
 
 	for _, annotation := range lab.annotations {
@@ -54,27 +54,27 @@ func (lab *Lab) DumpLabels() []string {
 	return result
 }
 
-// GetName gets the name of a lab object.
+// GetName gets the name of a Lab.
 func (lab *Lab) GetName() string {
 	return lab.name
 }
 
-// SetName sets the name of a lab object.
+// SetName sets the name of a Lab.
 func (lab *Lab) SetName(name string) {
 	lab.name = name
 }
 
-// GetPrecision gets the precision of a lab object
+// GetPrecision gets the precision of a Lab.
 func (lab *Lab) GetPrecision() uint8 {
 	return lab.precision
 }
 
-// SetPrecision sets the precision of a lab object.
+// SetPrecision sets the precision of a Lab.
 func (lab *Lab) SetPrecision(precision uint8) {
 	lab.precision = precision
 }
 
-// GetDuration gets the total duration of a lab by getting the difference in global start and end.
+// GetDuration gets the total duration of a Lab by getting the difference in global start and end.
 func (lab *Lab) GetDuration() (result float64) {
 	// calculate using start and end in case lab file doesn't start at 0
 	start := lab.annotations[0].start
@@ -83,7 +83,7 @@ func (lab *Lab) GetDuration() (result float64) {
 	return end - start
 }
 
-// GetLength gets the total amount of annotations in a lab file.
+// GetLength gets the total amount of annotations in a Lab.
 func (lab *Lab) GetLength() (result int) {
 	return len(lab.annotations)
 }
@@ -142,8 +142,8 @@ func ReadLab(path string) (Lab, error) {
 	return lab, err
 }
 
-// WriteLab writes a lab to a file from a given path. If the file already exists, it will be overwritten unless overwrite is set to false.
-// If the path is a directory, the lab will be written to a file with the same name as the lab, in the directory.
+// WriteLab writes a Lab to a file from a given path. If the file already exists, it will be overwritten unless overwrite is set to false.
+// If the path is a directory, the contents will be written to a file with the same name as the Lab, in the directory.
 func (lab *Lab) WriteLab(path string, overwrite ...bool) error {
 	// if no overwrite is specified, default to false
 	if len(overwrite) == 0 {
@@ -225,7 +225,7 @@ func (lab *Lab) ToString() string {
 	return result
 }
 
-// Parses the precision of a lab file based on the context of the time durations.
+// parsePrecision retrieves the precision field of a Lab based on the context of the time durations.
 func (lab *Lab) parsePrecision(secondTime string) {
 	periodIndex := strings.Index(secondTime, ".")
 
@@ -237,7 +237,7 @@ func (lab *Lab) parsePrecision(secondTime string) {
 	lab.precision = uint8(len(secondTime) - periodIndex - 1)
 }
 
-// Compare two slices to see if they are identical
+// isEqualSlice compares two slices, returning true if they are identical.
 func isEqualSlice(slice1, slice2 []string) bool {
 	// if they aren't the same length, we return false right away
 	if len(slice1) != len(slice2) {

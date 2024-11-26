@@ -174,7 +174,7 @@ func TestDumpingLabels(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	labSlice := lab.DumpLabels()
+	labSlice := lab.GetLabels()
 
 	groundTruthSlice := []string{"test", "test2"}
 
