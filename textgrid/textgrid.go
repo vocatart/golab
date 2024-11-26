@@ -274,13 +274,13 @@ func (tg *TextGrid) WriteLong(path string, overwrite ...bool) error {
 
 			for intervalNum, interval := range tier.GetIntervals() {
 				// write interval number
-				_, err = fmt.Fprintf(file, "\t\tintervals [%d]:\n", intervalNum)
+				_, err = fmt.Fprintf(file, "\t\tintervals [%d]:\n", intervalNum+1)
 				if err != nil {
 					return err
 				}
 
 				// xmin and xmax
-				_, err = fmt.Fprintf(file, "\t\t\txmin = %f\n\t\t\txmax = %f\n", tg.xmin, tg.xmax)
+				_, err = fmt.Fprintf(file, "\t\t\txmin = %s\n\t\t\txmax = %s\n", f2s(interval.xmin), f2s(interval.xmax))
 				if err != nil {
 					return err
 				}
@@ -306,7 +306,7 @@ func (tg *TextGrid) WriteLong(path string, overwrite ...bool) error {
 				}
 
 				// value
-				_, err = fmt.Fprintf(file, "\t\t\tnumber = %f\n", point.value)
+				_, err = fmt.Fprintf(file, "\t\t\tnumber = %s\n", f2s(point.value))
 				if err != nil {
 					return err
 				}
