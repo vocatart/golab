@@ -628,7 +628,7 @@ func pullQuotedValue(str string) string {
 }
 
 // pullBracketedValue takes a value that has angle brackets and removes them.
-// this is only used for flags in TextGrids, so internal brackets are ignored..
+// this is only used for flags in TextGrids, so internal brackets are ignored.
 func pullBracketedValue(str string) string {
 	stringRegex := regexp.MustCompile(`[<>]`)
 	return stringRegex.ReplaceAllString(str, "")
@@ -654,7 +654,7 @@ func pullFloat(str string) (float64, error) {
 	return result, nil
 }
 
-// getEncoding returns encoding type of byte slice..
+// getEncoding returns encoding type of byte slice.
 func getEncoding(data []byte) (string, error) {
 	detector := chardet.NewTextDetector()
 

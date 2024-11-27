@@ -219,17 +219,25 @@ func (iTier *IntervalTier) GetIntervals() []Interval {
 
 // GetPoints implements Tier.
 func (iTier *IntervalTier) GetPoints() []Point {
-	panic("not point tier")
+	panic("error: cannot return points from IntervalTier (type mismatch)")
 }
 
 // PushPoint implements Tier.
-func (iTier *IntervalTier) PushPoint(Point, ...bool) error {
-	panic("not point tier")
+func (iTier *IntervalTier) PushPoint(point Point, warn ...bool) error {
+	if len(warn) == 0 {
+		warn = append(warn, true)
+	}
+
+	return fmt.Errorf("error: cannot push point [%s, %s] to IntervalTier %q (type mismatch)", point.GetMark(), f2s(point.GetValue()), iTier.name)
 }
 
 // PushPoints implements Tier.
-func (iTier *IntervalTier) PushPoints([]Point, ...bool) error {
-	panic("not point tier")
+func (iTier *IntervalTier) PushPoints(points []Point, warn ...bool) error {
+	if len(warn) == 0 {
+		warn = append(warn, true)
+	}
+
+	return fmt.Errorf("error: cannot push points starting with point [%s, %s] to IntervalTier %q (type mismatch)", points[0].GetMark(), f2s(points[0].GetValue()), iTier.name)
 }
 
 // GetPoints returns Point slice from PointTier.
@@ -239,17 +247,25 @@ func (pTier *PointTier) GetPoints() []Point {
 
 // GetIntervals implements Tier.
 func (pTier *PointTier) GetIntervals() []Interval {
-	panic("not interval tier")
+	panic("error: cannot return intervals from PointTier (type mismatch)")
 }
 
 // PushInterval implements Tier.
-func (pTier *PointTier) PushInterval(Interval, ...bool) error {
-	panic("not interval tier")
+func (pTier *PointTier) PushInterval(intervalTier Interval, warn ...bool) error {
+	if len(warn) == 0 {
+		warn = append(warn, true)
+	}
+
+	return fmt.Errorf("error: cannot push interval [%s, %s, %s] to PointTier %q (type mismatch)", f2s(intervalTier.xmin), f2s(intervalTier.xmax), intervalTier.text, pTier.name)
 }
 
 // PushIntervals implements Tier.
-func (pTier *PointTier) PushIntervals([]Interval, ...bool) error {
-	panic("not interval tier")
+func (pTier *PointTier) PushIntervals(intervals []Interval, warn ...bool) error {
+	if len(warn) == 0 {
+		warn = append(warn, true)
+	}
+
+	return fmt.Errorf("error: cannot push intervals starting with [%s, %s, %s] to PointTier %q (type mismatch)", f2s(intervals[0].xmin), f2s(intervals[0].xmax), intervals[0].text, pTier.name)
 }
 
 // PushInterval appends an Interval to IntervalTier. Sorts Interval slice by all xmin values after pushing the Interval.
@@ -268,6 +284,30 @@ func (iTier *IntervalTier) PushInterval(intervalPush Interval, warn ...bool) err
 	iTier.sort()
 
 	return nil
+}
+
+// SetPoints sets Point slice field of PointTier.
+func (pTier *PointTier) SetPoints(newPoints []Point, warn ...bool) error {
+	if len(warn) == 0 {
+		warn = append(warn, true)
+	}
+
+	for _, point := range newPoints {
+		if point.value < pTier.xmin && warn[0] || point.value > pTier.xmax && warn[0] {
+			return fmt.Errorf("warning: you are trying to push point with value of %f but tier %s has existing xmin and xmax [%f, %f]", point.value, pTier.name, pTier.xmin, pTier.xmax)
+		}
+	}
+
+	return nil
+}
+
+// SetPoints implements Tier.
+func (iTier *IntervalTier) SetPoints(newPoints []Point, warn ...bool) error {
+	if len(warn) == 0 {
+		warn = append(warn, true)
+	}
+
+	return fmt.Errorf("error: cannot set points starting with [%s, %s] of IntervalTier %s (type mismatch)", f2s(newPoints[0].value), newPoints[0].mark, iTier.name)
 }
 
 // PushIntervals appends an Interval slice to IntervalTier. Sorts Interval slice by all xmin values after pushing the Interval slice.
@@ -317,18 +357,36 @@ func (iTier *IntervalTier) SetIntervals(newIntervals []Interval, warn ...bool) e
 }
 
 // SetIntervals implements Tier.
-func (pTier *PointTier) SetIntervals([]Interval, ...bool) error {
-	panic("not interval tier")
+func (pTier *PointTier) SetIntervals(intervals []Interval, warn ...bool) error {
+	if len(warn) == 0 {
+		warn = append(warn, true)
+	}
+
+	return fmt.Errorf("error: cannot set intervals starting with [%s, %s, %s] to PointTier %q (type mismatch)", f2s(intervals[0].xmin), f2s(intervals[0].xmax), intervals[0].text, pTier.name)
 }
 
-// GetOverlapping implements Tier.
+// GetOverlapping checks for overlaps in PointTier. Returns 2d slice of overlapping Point indices, or nil.
 func (pTier *PointTier) GetOverlapping() [][]int {
-	panic("not interval tier")
+	var overlaps [][]int
+
+	// iterate over each pair of points, comparing the value to the next value (which should not be the same)
+	for i, point := range pTier.points {
+		nextPoint := pTier.points[i+1]
+
+		if point.value == nextPoint.value {
+			overlaps = append(overlaps, []int{i, i + 1})
+		}
+	}
+
+	if overlaps != nil {
+		return overlaps
+	} else {
+		return nil
+	}
 }
 
-// GetOverlapping checks for overlaps in an interval tier. Returns a 2d slide of overlapping interval indices, or nil.
+// GetOverlapping checks for overlaps in IntervalTier. Returns a 2d slide of overlapping interval indices, or nil.
 func (iTier *IntervalTier) GetOverlapping() [][]int {
-
 	var overlaps [][]int
 
 	// iterate over each pair of intervals, comparing the xmax to the next xmin (which should be the same)
