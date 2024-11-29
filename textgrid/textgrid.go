@@ -55,9 +55,14 @@ func (tg *TextGrid) SetName(name string) {
 	tg.name = name
 }
 
-// GetTiers returns tiers of a Textgrid.
+// GetTiers returns Tier slice of a TextGrid.
 func (tg *TextGrid) GetTiers() []Tier {
 	return tg.tiers
+}
+
+// SetTiers sets TextGrid tier field to Tier slice.
+func (tg *TextGrid) SetTiers(tiers []Tier) {
+	tg.tiers = tiers
 }
 
 // HasIntervalTier returns true if TextGrid has IntervalTier.
@@ -73,14 +78,14 @@ func (tg *TextGrid) HasIntervalTier() bool {
 // HasPointTier returns true if TextGrid has PointTier.
 func (tg *TextGrid) HasPointTier() bool {
 	for _, tier := range tg.tiers {
-		if tier.GetType() == "PointTier" {
+		if tier.GetType() == "TextTier" {
 			return true
 		}
 	}
 	return false
 }
 
-// GetTier returns given tier with specified name, if it exists.
+// GetTier returns given Tier with specified name, if it exists.
 func (tg *TextGrid) GetTier(name string) Tier {
 	for _, tier := range tg.tiers {
 		if tier.GetName() == name {
@@ -90,9 +95,27 @@ func (tg *TextGrid) GetTier(name string) Tier {
 	return nil
 }
 
-// TierAtIndex returns given tier with specified index. Does not return nil if index is out of range.
+// SetTier sets Tier with specified name, if it exists.
+func (tg *TextGrid) SetTier(name string, newTier Tier) {
+	for i, tier := range tg.tiers {
+		if tier.GetName() == name {
+			tg.tiers[i] = newTier
+		}
+	}
+}
+
+// TierAtIndex returns given Tier with specified index. Does not return nil if index is out of range.
 func (tg *TextGrid) TierAtIndex(index int) Tier {
 	return tg.tiers[index]
+}
+
+// SetTierAtIndex sets Tier at given index.
+func (tg *TextGrid) SetTierAtIndex(index int, newTier Tier) {
+	for i := range tg.tiers {
+		if i == index {
+			tg.tiers[i] = newTier
+		}
+	}
 }
 
 // GetSize returns the amount of Tier entries in a TextGrid.
@@ -149,8 +172,6 @@ func ReadTextgrid(path string) (TextGrid, error) {
 	if err != nil {
 		return tg, fmt.Errorf("error: cannot parse textgrid xmax in %s:\n %s", tg.name, err.Error())
 	}
-
-	fmt.Println(globalXmax)
 
 	// set the xmin and xmax preemptively in case the status is <absent>
 	tg.xmin = globalXmin

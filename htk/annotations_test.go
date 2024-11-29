@@ -2,100 +2,33 @@ package htk
 
 import "testing"
 
-func TestGettingAnnotationDuration(t *testing.T) {
-	// loading the first annotation from the first example as a dummy annotation
-	lab, err := ReadLab("examples/01.lab")
-	if err != nil {
-		t.Fatal(err)
+func TestCreatingAnnotation(t *testing.T) {
+	annotation := Annotation{0.0, 10.0, "test"}
+
+	if annotation.GetStart() != 0.0 {
+		t.Errorf("expected 0.0, got %f", annotation.GetStart())
+	}
+	if annotation.GetEnd() != 10.0 {
+		t.Errorf("expected 10.0, got %f", annotation.GetEnd())
+	}
+	if annotation.GetLabel() != "test" {
+		t.Errorf("expected test, got %s", annotation.GetLabel())
+	}
+	if annotation.GetDuration() != 10.0 {
+		t.Errorf("expected 10.0, got %f", annotation.GetDuration())
 	}
 
-	annotation := lab.annotations[0]
-	trueDuration := annotation.end - annotation.start
+	annotation.SetStart(15.0)
+	annotation.SetEnd(20.0)
+	annotation.SetLabel("test2")
 
-	if annotation.GetDuration() != trueDuration {
-		t.Fatalf("wanted duration %f, received %f", trueDuration, annotation.GetDuration())
+	if annotation.GetStart() != 15.0 {
+		t.Errorf("expected 15.0, got %f", annotation.GetStart())
 	}
-
-	t.Log("Getting annotation duration successful!")
-}
-
-func TestGettingAnnotationStart(t *testing.T) {
-	lab, err := ReadLab("examples/01.lab")
-	if err != nil {
-		t.Fatal(err)
+	if annotation.GetEnd() != 20.0 {
+		t.Errorf("expected 20.0, got %f", annotation.GetEnd())
 	}
-
-	annotation := lab.annotations[0]
-	trueStart := annotation.start
-
-	if annotation.GetStart() != trueStart {
-		t.Fatalf("wanted start time of %f, received %f", trueStart, annotation.GetStart())
-	}
-
-	t.Log("getting annotation start successful!")
-}
-
-func TestGettingAnnotationEnd(t *testing.T) {
-	lab, err := ReadLab("examples/01.lab")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	annotation := lab.annotations[0]
-	trueEnd := annotation.end
-
-	if annotation.GetEnd() != trueEnd {
-		t.Fatalf("wanted end time of %f, received %f", trueEnd, annotation.GetEnd())
-	}
-
-	t.Log("getting annotation end successful!")
-}
-
-func TestGettingAnnotationLabel(t *testing.T) {
-	lab, err := ReadLab("examples/01.lab")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	annotation := lab.annotations[0]
-	trueLabel := annotation.label
-
-	if annotation.GetLabel() != trueLabel {
-		t.Fatalf("wanted label %s, received %s", trueLabel, annotation.GetLabel())
-	}
-
-	t.Log("test setting annotation label successful!")
-}
-
-func TestSettingAnnotationStartEnd(t *testing.T) {
-	lab, err := ReadLab("examples/01.lab")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	annotation := lab.annotations[0]
-	annotation.SetStart(10)
-	annotation.SetEnd(20)
-
-	if annotation.start != 10 {
-		t.Fatalf("wanted start time of 10, received %f", annotation.start)
-	} else if annotation.end != 20 {
-		t.Fatalf("wanted end time of 20, received %f", annotation.end)
-	}
-
-	t.Log("setting annotation start and end successful!")
-}
-
-func TestSettingAnnotationLabel(t *testing.T) {
-	lab, err := ReadLab("examples/01.lab")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	annotation := lab.annotations[0]
-	annotation.SetLabel("label")
-
-	if annotation.label != "label" {
-		t.Fatalf("wanted label string of \"label\", recieved %s", annotation.label)
+	if annotation.GetLabel() != "test2" {
+		t.Errorf("expected test2, got %s", annotation.GetLabel())
 	}
 }

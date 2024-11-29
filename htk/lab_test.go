@@ -8,15 +8,13 @@ func TestReadingLab(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if lab.name != "short.lab" {
-		t.Fatalf("wanted 'short', recieved %s", lab.name)
-	} else if lab.annotations == nil {
+	if lab.GetName() != "short.lab" {
+		t.Fatalf("wanted 'short', recieved %s", lab.GetName())
+	} else if lab.GetAnnotations() == nil {
 		t.Fatalf("wanted annotations, recieved nil")
-	} else if lab.precision != 7 {
-		t.Fatalf("wanted precision of 7, recieved %d", lab.precision)
+	} else if lab.GetPrecision() != 7 {
+		t.Fatalf("wanted precision of 7, recieved %d", lab.GetPrecision())
 	}
-
-	t.Log("lab reading successful!")
 }
 
 func TestReadingDifferentPrecision(t *testing.T) {
@@ -25,11 +23,9 @@ func TestReadingDifferentPrecision(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if lab.precision != 6 {
-		t.Fatalf("wanted precision of 6, recieved %d", lab.precision)
+	if lab.GetPrecision() != 6 {
+		t.Fatalf("wanted precision of 6, recieved %d", lab.GetPrecision())
 	}
-
-	t.Log("different precisions reading successful!")
 }
 
 func TestWritingLab(t *testing.T) {
@@ -42,8 +38,6 @@ func TestWritingLab(t *testing.T) {
 	if err != nil {
 		return
 	}
-
-	t.Log("lab writing successful!")
 }
 
 func TestWritingDifferentPrecision(t *testing.T) {
@@ -56,8 +50,6 @@ func TestWritingDifferentPrecision(t *testing.T) {
 	if err != nil {
 		return
 	}
-
-	t.Log("different precision writing successful!")
 }
 
 func TestPrintingLabString(t *testing.T) {
@@ -69,8 +61,6 @@ func TestPrintingLabString(t *testing.T) {
 	if lab.ToString() != "0.0000000 10.0000000 test\n" {
 		t.Fatal("malformed lab string!")
 	}
-
-	t.Log("printing lab to string successful!")
 }
 
 func TestSettingAnnotations(t *testing.T) {
@@ -84,8 +74,6 @@ func TestSettingAnnotations(t *testing.T) {
 	if lab.ToString() != "0 1 test1\n1 2 test2\n2 3 test3\n" {
 		t.Fatal("annotations not set correctly!")
 	}
-
-	t.Log("setting annotations successful!")
 }
 
 func TestGettingAnnotations(t *testing.T) {
@@ -94,15 +82,13 @@ func TestGettingAnnotations(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if lab.annotations[0].start != 0 {
-		t.Fatalf("incorrect annotation start time! wanted 0, recieved %f", lab.annotations[0].start)
-	} else if lab.annotations[0].end != 10 {
-		t.Fatalf("incorrect annotation end time! wanted 10, recieved %f", lab.annotations[0].end)
-	} else if lab.annotations[0].label != "test" {
-		t.Fatalf("incorrect annotation label!, wanted string \"test\", recieved string \"%s\"", lab.annotations[0].label)
+	if lab.GetAnnotations()[0].GetStart() != 0 {
+		t.Fatalf("incorrect annotation start time! wanted 0, recieved %f", lab.GetAnnotations()[0].GetStart())
+	} else if lab.GetAnnotations()[0].GetEnd() != 10 {
+		t.Fatalf("incorrect annotation end time! wanted 10, recieved %f", lab.GetAnnotations()[0].GetEnd())
+	} else if lab.GetAnnotations()[0].GetLabel() != "test" {
+		t.Fatalf("incorrect annotation label!, wanted string \"test\", recieved string \"%s\"", lab.GetAnnotations()[0].GetLabel())
 	}
-
-	t.Log("getting annotations successful!")
 }
 
 func TestPushingAnnotation(t *testing.T) {
@@ -120,8 +106,6 @@ func TestPushingAnnotation(t *testing.T) {
 	} else if lab.annotations[2].end != 30 {
 		t.Fatalf("incorrect annotation end time! wanted end time 30, recieved %f", lab.annotations[2].end)
 	}
-
-	t.Log("pushing annotations successful!")
 }
 
 func TestAppendingAnnotations(t *testing.T) {
@@ -150,8 +134,6 @@ func TestAppendingAnnotations(t *testing.T) {
 	} else if lab.annotations[3].label != "new_annotation2" {
 		t.Fatalf("incorrect annotation label!")
 	}
-
-	t.Log("appending annotations successful!")
 }
 
 func TestClearingAnnotations(t *testing.T) {
@@ -165,8 +147,6 @@ func TestClearingAnnotations(t *testing.T) {
 	if lab.ToString() != "" {
 		t.Fatal("lab not properly cleared!")
 	}
-
-	t.Log("clearing annotations successful!")
 }
 
 func TestDumpingLabels(t *testing.T) {
@@ -181,8 +161,6 @@ func TestDumpingLabels(t *testing.T) {
 	if isEqualSlice(labSlice, groundTruthSlice) == false {
 		t.Fatal("returned slices not identical!")
 	}
-
-	t.Log("annotation dumping successful!")
 }
 
 func TestGettingLabName(t *testing.T) {
@@ -194,8 +172,6 @@ func TestGettingLabName(t *testing.T) {
 	if lab.GetName() != lab.name {
 		t.Fatalf("wanted lab name %s, recieved %s", lab.name, lab.GetName())
 	}
-
-	t.Log("getting lab name successful!")
 }
 
 func TestSettingLabName(t *testing.T) {
@@ -209,8 +185,6 @@ func TestSettingLabName(t *testing.T) {
 	if lab.name != "newName" {
 		t.Fatalf("wanted lab name of \"newName\", recieved \"%s\"", lab.name)
 	}
-
-	t.Log("setting lab name successful!")
 }
 
 func TestGettingPrecision(t *testing.T) {
@@ -222,8 +196,6 @@ func TestGettingPrecision(t *testing.T) {
 	if lab.GetPrecision() != lab.precision {
 		t.Fatalf("wanted precision %d, recieved %d", lab.precision, lab.GetPrecision())
 	}
-
-	t.Log("getting precision successful!")
 }
 
 func TestSettingPrecision(t *testing.T) {
@@ -242,8 +214,6 @@ func TestSettingPrecision(t *testing.T) {
 	if err != nil {
 		return
 	}
-
-	t.Log("setting precision successful!")
 }
 
 func TestGettingLabDuration(t *testing.T) {
@@ -257,8 +227,6 @@ func TestGettingLabDuration(t *testing.T) {
 	if lab.GetDuration() != trueDuration {
 		t.Fatalf("wanted duration of %f, recieved %f", trueDuration, lab.GetDuration())
 	}
-
-	t.Log("getting lab duration successful!")
 }
 
 func TestGettingLabLength(t *testing.T) {
@@ -272,6 +240,4 @@ func TestGettingLabLength(t *testing.T) {
 	if lab.GetLength() != trueLength {
 		t.Fatalf("wanted length of %d, recieved %d", trueLength, lab.GetLength())
 	}
-
-	t.Log("getting lab length successful!")
 }

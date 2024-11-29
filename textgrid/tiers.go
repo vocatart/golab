@@ -298,6 +298,9 @@ func (pTier *PointTier) SetPoints(newPoints []Point, warn ...bool) error {
 		}
 	}
 
+	pTier.points = newPoints
+	pTier.sort()
+
 	return nil
 }
 
@@ -335,7 +338,6 @@ func (iTier *IntervalTier) PushIntervals(intervalsPush []Interval, warn ...bool)
 // SetIntervals sets intervals field of IntervalTier.
 // By default, will return an error if there is an Interval that has an xmin or xmax not inside the TextGrid range.
 func (iTier *IntervalTier) SetIntervals(newIntervals []Interval, warn ...bool) error {
-
 	if len(warn) == 0 {
 		warn = append(warn, true)
 	}
@@ -371,10 +373,12 @@ func (pTier *PointTier) GetOverlapping() [][]int {
 
 	// iterate over each pair of points, comparing the value to the next value (which should not be the same)
 	for i, point := range pTier.points {
-		nextPoint := pTier.points[i+1]
+		if len(pTier.points) > i+1 {
+			nextPoint := pTier.points[i+1]
 
-		if point.value == nextPoint.value {
-			overlaps = append(overlaps, []int{i, i + 1})
+			if point.value == nextPoint.value {
+				overlaps = append(overlaps, []int{i, i + 1})
+			}
 		}
 	}
 
@@ -391,10 +395,12 @@ func (iTier *IntervalTier) GetOverlapping() [][]int {
 
 	// iterate over each pair of intervals, comparing the xmax to the next xmin (which should be the same)
 	for i, interval := range iTier.intervals {
-		nextInterval := iTier.intervals[i+1]
+		if len(iTier.intervals) > i+1 {
+			nextInterval := iTier.intervals[i+1]
 
-		if interval.xmax != nextInterval.xmin {
-			overlaps = append(overlaps, []int{i, i + 1})
+			if interval.xmax != nextInterval.xmin {
+				overlaps = append(overlaps, []int{i, i + 1})
+			}
 		}
 	}
 
