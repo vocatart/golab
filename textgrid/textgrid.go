@@ -126,7 +126,7 @@ func (tg *TextGrid) GetSize() int {
 // ReadTextgrid takes a path to a .TextGrid file and reads its contents into a TextGrid.
 func ReadTextgrid(path string) (TextGrid, error) {
 	var tg = TextGrid{}
-	tgDeque := deque.Deque[string]{}
+	tgDeque := new(deque.Deque[string])
 
 	// grab the name element from the path
 	tg.name = filepath.Base(path)
@@ -157,7 +157,7 @@ func ReadTextgrid(path string) (TextGrid, error) {
 	}
 
 	// verify the first two entries in the deque
-	err = verifyHead(&tgDeque)
+	err = verifyHead(tgDeque)
 	if err != nil {
 		return tg, fmt.Errorf("error: textgrid %s has malformed header\n %s", tg.name, err.Error())
 	}
@@ -192,7 +192,7 @@ func ReadTextgrid(path string) (TextGrid, error) {
 		return tg, fmt.Errorf("error: cannot parse textgrid numTiers:\n %s", err.Error())
 	}
 
-	tiers, err := parseTiers(globalXmin, globalXmax, &tgDeque, numTiers)
+	tiers, err := parseTiers(globalXmin, globalXmax, tgDeque, numTiers)
 	if err != nil {
 		return tg, fmt.Errorf("error: cannot parse textgrid tiers:\n %s", err.Error())
 	}
