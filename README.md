@@ -32,51 +32,72 @@ TextGrid files have a flag that designate whether they contain tiers. For exampl
 would look like the following:
 
 ```TextGrid
-   File type = "ooTextFile"
-   Object class = "TextGrid"
-   
-   xmin = 0
-   xmax = 2.3
-   tiers? <exists>
-   size = 3
-   item []:
-       item [1]:
-           class = "IntervalTier"
-           name = "Mary"
-           xmin = 0
-           xmax = 2.3
-           intervals: size = 1
-           intervals [1]:
-               xmin = 0
-               xmax = 2.3
-               text = ""
-       item [2]:
-           class = "IntervalTier"
-           name = "John"
-           xmin = 0
-           xmax = 2.3
-           intervals: size = 1
-           intervals [1]:
-               xmin = 0
-               xmax = 2.3
-               text = ""
-       item [3]:
-           class = "TextTier"
-           name = "bell"
-           xmin = 0
-           xmax = 2.3
-           points: size = 0
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 2.3510204081632655 
+tiers? <exists> 
+size = 3 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "Mary" 
+        xmin = 0 
+        xmax = 2.3510204081632655 
+        intervals: size = 3 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.7427342752056899 
+            text = "1_label1" 
+        intervals [2]:
+            xmin = 0.7427342752056899 
+            xmax = 1.7447703580322245 
+            text = "1_label2"
+        intervals [3]:
+            xmin = 1.7447703580322245 
+            xmax = 2.3510204081632655 
+            text = "1_label3" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "John" 
+        xmin = 0 
+        xmax = 2.3510204081632655 
+        intervals: size = 2 
+        intervals [1]:
+            xmin = 0 
+            xmax = 1.2402970197816243 
+            text = "2_label1" 
+        intervals [2]:
+            xmin = 1.2402970197816243 
+            xmax = 2.3510204081632655 
+            text = "2_label2" 
+    item [3]:
+        class = "TextTier" 
+        name = "Bell" 
+        xmin = 0 
+        xmax = 2.3510204081632655 
+        points: size = 3 
+        points [1]:
+            number = 0.40238753672840144 
+            mark = "point1" 
+        points [2]:
+            number = 1.1677357861976339 
+            mark = "point2" 
+        points [3]:
+            number = 1.8950757704562047 
+            mark = "point3" 
 ```
 
 while a TextGrid with no tiers would have an `<absent>` tag instead.
 
 ```TextGrid
-   File type = "ooTextFile"
-   Object class = "TextGrid"
-   
-   xmin = 0
-   xmax = 2.3
-   tiers? <absent>
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 2.3510204081632655 
+tiers? <absent>
 ```
 
 ## example
