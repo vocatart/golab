@@ -4,7 +4,7 @@ go 1.23.0
 
 toolchain go1.24.1
 
-require github.com/gammazero/deque v1.0.0
+require github.com/gammazero/deque v1.1.0
 
 require (
 	github.com/TomOnTime/utfutil v1.0.0
