@@ -1,10 +1,10 @@
 module github.com/vocatart/golab
 
-go 1.23.0
+go 1.24
 
 toolchain go1.24.1
 
-require github.com/gammazero/deque v1.2.0
+require github.com/gammazero/deque v1.2.1
 
 require (
 	github.com/TomOnTime/utfutil v1.0.0
